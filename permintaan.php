@@ -167,7 +167,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['do'] ?? '') === 'ajukan') 
         }
 
         $pdo->commit();
-        log_activity($pdo, 'permintaan', 'tambah', 'Permintaan #' . $pid . ' dari ' . ($u['bidang_nama'] ?? '-') . ' (' . count($preparedRows) . ' barang)', 'keluar', (int)array_sum(array_column($preparedRows, 'jumlah_base')));
+        log_activity($pdo, 'permintaan', 'tambah', 'Permintaan #' . $pid . ' dari ' . ($u['bidang_nama'] ?? '-') . ': ' . implode(', ', array_map(function ($r) { return $r['nama_barang'] . ' x' . $r['jumlah_base']; }, array_slice($preparedRows, 0, 4))) . (count($preparedRows) > 4 ? ' +' . (count($preparedRows) - 4) . ' lainnya' : ''), 'keluar', (int)array_sum(array_column($preparedRows, 'jumlah_base')));
         flash_set('Permintaan ATK berhasil diajukan, stok otomatis dikurangi. Pantau progresnya di menu Progres ATK.');
     } catch (Exception $e) {
         $pdo->rollBack();

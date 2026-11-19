@@ -42,81 +42,90 @@ function sisa_waktu_edit_menit(array $r): int
     return max(0, (int) ceil($sisaDetik / 60));
 }
 
+// Hitung ringkasan untuk kartu angka di atas.
+$ringkas = ['total' => count($myRequests), 'menunggu' => 0, 'diproses' => 0, 'selesai' => 0];
+foreach ($myRequests as $r) { if (isset($ringkas[$r['status']])) $ringkas[$r['status']]++; }
+$stepIndex = ['menunggu' => 0, 'diproses' => 1, 'selesai' => 2, 'ditolak' => 0];
+
 require __DIR__ . '/includes/header.php';
 ?>
-<style>
-  .pq-card{border:1px solid var(--line,#232a35);border-radius:12px;padding:16px;background:var(--panel,#12161c);margin-bottom:12px;}
-  .pq-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;}
-  .pq-date{font-weight:600;font-size:14px;}
-  .pq-sub{font-size:12px;color:var(--text-dim,#8b95a5);margin-top:2px;}
-  .pq-items{margin-top:10px;font-size:13px;}
-  .pq-items li{margin-bottom:2px;}
-  .pq-note{margin-top:10px;font-size:12.5px;background:rgba(140,150,165,.08);border-radius:8px;padding:8px 10px;}
-  .pq-actions{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap;}
-  .pq-edit-hint{font-size:11.5px;color:var(--text-dim,#8b95a5);}
-
-  .st-badge{font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:20px;white-space:nowrap;}
-  .st-menunggu{background:rgba(245,158,11,.14);color:var(--ochre-dark);}
-  .st-diproses{background:rgba(76,140,255,.15);color:#4c8cff;}
-  .st-selesai{background:rgba(76,175,140,.15);color:var(--teal-dark);}
-  .st-ditolak{background:rgba(220,38,38,.10);color:var(--red);}
-</style>
-
 <div class="topline">
-  <div><h1>Progres ATK</h1><div class="sub">Status permintaan ATK yang sudah diajukan bidang <?= e($u['bidang_nama'] ?? '-') ?></div></div>
+  <div><h1>Progres ATK</h1><div class="sub">Pantau status permintaan ATK bidang <?= e($u['bidang_nama'] ?? '-') ?> secara langsung</div></div>
+  <a class="btn btn-orange" href="permintaan.php">+ Ajukan Permintaan</a>
 </div>
 
 <?php if (!empty($_GET['msg'])): ?>
-  <div class="card" style="border-color:var(--teal-dark);"><div class="empty" style="color:var(--teal-dark);"><?= e($_GET['msg']) ?></div></div>
+  <div class="flash ok"><?= e($_GET['msg']) ?></div>
 <?php endif; ?>
 <?php if (!empty($_GET['err'])): ?>
-  <div class="card" style="border-color:var(--red);"><div class="empty" style="color:var(--red);"><?= e($_GET['err']) ?></div></div>
+  <div class="flash error"><?= e($_GET['err']) ?></div>
 <?php endif; ?>
 
+<div class="grid-stats pq-stats">
+  <div class="stat-card"><span class="stat-ic g-indigo"><?= icon('clipboard', 26) ?></span><span class="stat-body"><div class="val"><?= $ringkas['total'] ?></div><div class="label">Total permintaan</div></span></div>
+  <div class="stat-card"><span class="stat-ic g-amber"><?= icon('clock', 26) ?></span><span class="stat-body"><div class="val"><?= $ringkas['menunggu'] ?></div><div class="label">Menunggu</div></span></div>
+  <div class="stat-card"><span class="stat-ic g-gray"><?= icon('arrows', 26) ?></span><span class="stat-body"><div class="val"><?= $ringkas['diproses'] ?></div><div class="label">Diproses</div></span></div>
+  <div class="stat-card"><span class="stat-ic g-green"><?= icon('user-check', 26) ?></span><span class="stat-body"><div class="val"><?= $ringkas['selesai'] ?></div><div class="label">Selesai</div></span></div>
+</div>
+
 <?php if (!$myRequests): ?>
-  <div class="card"><div class="empty"><b>Belum ada permintaan</b>Ajukan permintaan lewat menu Permintaan ATK.</div></div>
-<?php else: foreach ($myRequests as $r): ?>
-  <div class="pq-card">
+  <div class="card"><div class="empty-panel" style="padding:36px 10px;">
+    <span class="empty-ic"><?= icon('clipboard', 26) ?></span>
+    <b>Belum ada permintaan</b>
+    <p style="margin:0 auto;max-width:300px;">Ajukan permintaan ATK pertama bidangmu lewat tombol di atas.</p>
+  </div></div>
+<?php else: foreach ($myRequests as $r):
+  $ditolak = $r['status'] === 'ditolak';
+  $si = $stepIndex[$r['status']] ?? 0;
+  $items = $itemsByReq[$r['id']] ?? [];
+?>
+  <div class="pq-card st-card-<?= e($r['status']) ?>">
     <div class="pq-top">
-      <div>
-        <div class="pq-date"><?= e(date('d M Y', strtotime($r['tanggal']))) ?></div>
-        <div class="pq-sub">Penanggung jawab: <?= e($r['penanggung_jawab']) ?></div>
+      <div class="pq-head">
+        <span class="pq-avatar"><?= icon('clipboard', 20) ?></span>
+        <div>
+          <div class="pq-date">Permintaan #<?= (int)$r['id'] ?> <span class="pq-dim">· <?= e(date('d M Y', strtotime($r['tanggal']))) ?></span></div>
+          <div class="pq-sub">Penanggung jawab: <b><?= e($r['penanggung_jawab']) ?></b></div>
+        </div>
       </div>
       <span class="st-badge <?= permintaan_status_class($r['status']) ?>"><?= e(permintaan_status_label($r['status'])) ?></span>
     </div>
-    <ul class="pq-items">
-      <?php foreach ($itemsByReq[$r['id']] ?? [] as $it): ?>
-       <li>
-          <?= e($it['nama_barang']) ?> — <b><?= (int)$it['jumlah'] ?></b> pcs
-          <?php if (!empty($it['keterangan_satuan'])): ?>
-            <span class="unit-note">(diajukan: <?= e($it['keterangan_satuan']) ?>)</span>
-          <?php endif; ?>
-        </li>
-      <?php endforeach; ?>
-    </ul>
 
-    <div class="pq-actions">
+    <?php if ($ditolak): ?>
+      <div class="pq-rejected">Permintaan ini ditolak. Stok yang tertahan sudah dikembalikan.</div>
+    <?php else: ?>
+      <ol class="pq-steps">
+        <?php foreach (['Diajukan', 'Diproses', 'Selesai'] as $n => $label): ?>
+          <li class="<?= $n < $si ? 'done' : ($n === $si ? 'now' : '') ?>"><span class="dot"><?= $n < $si || ($n === $si && $r['status'] === 'selesai') ? '&#10003;' : ($n + 1) ?></span><span class="lbl"><?= $label ?></span></li>
+        <?php endforeach; ?>
+      </ol>
+    <?php endif; ?>
+
+    <div class="pq-chips">
+      <?php foreach ($items as $it): ?>
+        <span class="pq-chip"><b><?= (int)$it['jumlah'] ?></b> <?= e($it['nama_barang']) ?><?php if (!empty($it['keterangan_satuan'])): ?> <i>(diajukan: <?= e($it['keterangan_satuan']) ?>)</i><?php endif; ?></span>
+      <?php endforeach; ?>
+    </div>
+
+    <div class="pq-foot">
       <?php if (permintaan_bisa_diedit($r)): ?>
-        <a class="btn btn-ghost" style="font-size:12px;padding:6px 10px;" href="permintaan.php?edit=<?= (int)$r['id'] ?>">Edit Permintaan</a>
-        <span class="pq-edit-hint">Bisa diedit sampai <?= sisa_waktu_edit_menit($r) ?> menit lagi</span>
+        <a class="btn btn-ghost" style="font-size:12.5px;padding:7px 12px;" href="permintaan.php?edit=<?= (int)$r['id'] ?>">Edit Permintaan</a>
+        <span class="pq-edit-hint">Bisa diedit <?= sisa_waktu_edit_menit($r) ?> menit lagi</span>
       <?php elseif ($r['status'] === 'menunggu'): ?>
         <span class="pq-edit-hint">Waktu edit (1 jam) sudah habis</span>
       <?php endif; ?>
-    </div>
-
-    <?php if ($r['bast_file']): ?>
-      <div style="margin-top:10px;">
-        <button type="button" class="btn btn-ghost js-view-doc" style="font-size:12px;padding:6px 10px;"
+      <?php if ($r['bast_file']): ?>
+        <button type="button" class="btn btn-ghost js-view-doc" style="font-size:12.5px;padding:7px 12px;margin-left:auto;"
           data-url="serve_permintaan_bast.php?id=<?= (int)$r['id'] ?>"
           data-download="serve_permintaan_bast.php?id=<?= (int)$r['id'] ?>&download=1"
           data-filename="<?= e($r['bast_file']) ?>"
           data-image="<?= strtolower(pathinfo($r['bast_file'], PATHINFO_EXTENSION)) === 'pdf' ? '0' : '1' ?>">Lihat BAST</button>
-      </div>
-    <?php else: ?>
-      <div class="pq-sub" style="margin-top:10px;">Belum ada BAST — unggah lewat menu Input BAST.</div>
-    <?php endif; ?>
+      <?php else: ?>
+        <span class="pq-edit-hint" style="margin-left:auto;">Belum ada BAST &mdash; unggah lewat menu Input BAST</span>
+      <?php endif; ?>
+    </div>
     <?php if ($r['catatan_admin']): ?>
-      <div class="pq-note">Catatan admin: <?= e($r['catatan_admin']) ?></div>
+      <div class="pq-note"><b>Catatan admin:</b> <?= e($r['catatan_admin']) ?></div>
     <?php endif; ?>
   </div>
 <?php endforeach; endif; ?>

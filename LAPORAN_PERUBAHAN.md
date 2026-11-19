@@ -130,6 +130,11 @@ Baru: `aktivitas.php`, `includes/activity_log.php`. Diubah: `index.php`, `includ
 - Pencatatan diuji dengan database uji (beberapa akun, masuk/keluar/hapus). Screenshot dashboard, tabel, dan Riwayat Aktivitas di kedua tema, komputer dan HP. Semua PHP lolos sintaks.
 - Belum diuji di MySQL aslimu: coba catat satu barang masuk lalu lihat dashboard.
 
+### 4. Notifikasi waktu-nyata & tampilan admin bidang
+- Saat bidang mengajukan permintaan ATK, admin/super admin yang punya akses "Permintaan ATK Bidang" langsung mendapat pop-up di pojok kanan atas (plus bunyi singkat), tanpa muat ulang. Halaman dicek tiap 5 detik. Lencana merah di menu menunjukkan jumlah permintaan yang menunggu, dan judul tab ikut berubah, misalnya "(2) Pendataan ATK".
+- Admin bidang: banner judul berwarna, kartu ringkasan (total/menunggu/diproses/selesai), dan kartu permintaan dengan alur status Diajukan → Diproses → Selesai.
+- File: `notifikasi.php` (aksi `live`), `includes/header.php`, `progres.php`, `permintaan.php`, `assets/style.css`.
+
 ## Yang masih perlu kamu lakukan
 
 1. **Tambahkan GD ke `Dockerfile`** supaya tidak hilang saat container dibuat ulang:

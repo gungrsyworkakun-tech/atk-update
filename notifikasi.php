@@ -17,6 +17,7 @@ header('Content-Type: application/json');
 $do = $_GET['do'] ?? $_POST['do'] ?? '';
 $u = current_user();
 $userId = $u['id'];
+session_write_close(); // lepas kunci sesi: endpoint ini dipanggil berkala (tiap beberapa detik)
 
 try {
     switch ($do) {
@@ -40,6 +41,22 @@ try {
             $unread = (int)$stmtUnread->fetch()['c'];
 
             echo json_encode(['items' => $items, 'unread' => $unread]);
+            break;
+
+        case 'live':
+            // Denyut waktu-nyata untuk admin: permintaan ATK baru dari bidang + jumlah yang menunggu.
+            if (is_bidang() || !has_permission('kelola_permintaan')) { echo json_encode(['last' => 0, 'baru' => [], 'pending' => 0]); break; }
+            activity_ensure_table($pdo);
+            $after = (int)($_GET['after'] ?? -1);
+            $last = (int)$pdo->query('SELECT COALESCE(MAX(id),0) FROM activity_log')->fetchColumn();
+            $baru = [];
+            if ($after >= 0 && $last > $after) {
+                $st = $pdo->prepare("SELECT id, username, detail, created_at FROM activity_log WHERE id > ? AND modul = 'permintaan' AND aksi = 'tambah' ORDER BY id LIMIT 10");
+                $st->execute([$after]);
+                $baru = $st->fetchAll(PDO::FETCH_ASSOC);
+            }
+            $pending = (int)$pdo->query("SELECT COUNT(*) FROM permintaan WHERE status = 'menunggu'")->fetchColumn();
+            echo json_encode(['last' => $last, 'baru' => $baru, 'pending' => $pending]);
             break;
 
         case 'count':

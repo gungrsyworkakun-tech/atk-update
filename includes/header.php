@@ -22,6 +22,10 @@ $breadcrumbLabel = $pageLabels[$currentPage] ?? null;
 
 // Jumlah kiriman (oper) baru dari admin untuk akun bidang -> lencana merah di menu.
 require_once __DIR__ . '/riwayat_helper.php';
+$pendingReq = 0;
+if (!is_bidang() && has_permission('kelola_permintaan')) {
+    try { $pendingReq = (int)($GLOBALS['pdo']->query("SELECT COUNT(*) FROM permintaan WHERE status = 'menunggu'")->fetchColumn()); } catch (Throwable $e) { $pendingReq = 0; }
+}
 $operBaru = is_bidang() ? oper_belum_dibaca($GLOBALS['pdo'] ?? null, (int)($u['id'] ?? 0)) : 0;
 
 /** Buang akhiran .php dari URL internal, biar link tampil bersih (clean URL via .htaccess). */
@@ -35,7 +39,7 @@ function nav_item($file, $label, $iconName, $badge = 0) {
     echo '<a class="nav-item ' . $active . '" href="' . e(clean_url($file)) . '">';
     echo '<span class="nav-ic">' . icon($iconName, 17) . '</span>';
     echo '<span class="lbl">' . e($label) . '</span>';
-    if ($badge > 0) echo '<span class="nav-badge" style="margin-left:auto;background:#DC2626;color:#fff;border-radius:20px;font-size:10.5px;font-weight:700;padding:1px 7px;">' . (int)$badge . '</span>';
+    if ($badge > 0) echo '<span class="nav-badge" data-live-badge style="margin-left:auto;background:#DC2626;color:#fff;border-radius:20px;font-size:10.5px;font-weight:700;padding:1px 7px;">' . (int)$badge . '</span>';
     echo '</a>';
 }
 ?>
@@ -54,7 +58,7 @@ function nav_item($file, $label, $iconName, $badge = 0) {
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/style.css?v=<?= @filemtime(dirname(__DIR__) . '/assets/style.css') ?: time() ?>">
 </head>
-<body>
+<body class="<?= is_bidang() ? 'is-bidang' : '' ?>">
 <div class="app">
   <div class="sidebar" id="sidebar">
     <div class="brand">
@@ -94,7 +98,7 @@ function nav_item($file, $label, $iconName, $badge = 0) {
           <?php if (has_permission('realisasi')): nav_item('realisasi.php', MODULES['realisasi'], MODULE_META['realisasi']['icon']); endif; ?>
           <?php if (has_permission('harga')): nav_item('harga.php', MODULES['harga'], MODULE_META['harga']['icon']); endif; ?>
           <?php if (has_permission('bidang')): nav_item('bidang.php', MODULES['bidang'], MODULE_META['bidang']['icon']); endif; ?>
-          <?php if (has_permission('kelola_permintaan')): nav_item('kelola_permintaan.php', MODULES['kelola_permintaan'], MODULE_META['kelola_permintaan']['icon']); endif; ?>
+          <?php if (has_permission('kelola_permintaan')): nav_item('kelola_permintaan.php', MODULES['kelola_permintaan'], MODULE_META['kelola_permintaan']['icon'], $pendingReq); endif; ?>
           <?php if (has_permission('penitipan')): nav_item('penitipan.php', MODULES['penitipan'], MODULE_META['penitipan']['icon']); endif; ?>
           <?php if (has_permission('kirim_notifikasi')): nav_item('kirim_notifikasi.php', MODULES['kirim_notifikasi'], MODULE_META['kirim_notifikasi']['icon']); endif; ?>
           <?php if (has_permission('opname')): nav_item('opname.php', MODULES['opname'], MODULE_META['opname']['icon']); endif; ?>
@@ -281,6 +285,65 @@ function nav_item($file, $label, $iconName, $badge = 0) {
         setInterval(cekJumlahSaja, 60000); // cek jumlah belum-dibaca tiap 1 menit
       })();
     </script>
+
+
+    <?php if (!is_bidang() && has_permission('kelola_permintaan')): ?>
+    <div id="live-toasts" aria-live="polite"></div>
+    <script>
+    // Notifikasi waktu-nyata: permintaan ATK baru dari bidang muncul sebagai pop-up tanpa perlu muat ulang.
+    (function(){
+      var KEY = 'atk-live-last', judulAsli = document.title, pending = <?= (int)$pendingReq ?>;
+      var navLink = document.querySelector('.nav-item[href*="kelola_permintaan"]');
+      function esc(s){ var d=document.createElement('div'); d.textContent=s||''; return d.innerHTML; }
+      function bunyi(){
+        try {
+          var C = window.AudioContext || window.webkitAudioContext; if (!C) return;
+          var c = new C(), o = c.createOscillator(), g = c.createGain();
+          o.type = 'sine'; o.frequency.setValueAtTime(880, c.currentTime); o.frequency.setValueAtTime(1175, c.currentTime + .12);
+          g.gain.setValueAtTime(.0001, c.currentTime); g.gain.exponentialRampToValueAtTime(.15, c.currentTime + .02);
+          g.gain.exponentialRampToValueAtTime(.0001, c.currentTime + .35);
+          o.connect(g); g.connect(c.destination); o.start(); o.stop(c.currentTime + .4);
+        } catch (e) {}
+      }
+      function setBadge(n){
+        pending = n;
+        if (navLink) {
+          var b = navLink.querySelector('[data-live-badge]');
+          if (n > 0) {
+            if (!b) { b = document.createElement('span'); b.setAttribute('data-live-badge',''); b.className = 'nav-badge';
+              b.style.cssText = 'margin-left:auto;background:#DC2626;color:#fff;border-radius:20px;font-size:10.5px;font-weight:700;padding:1px 7px;'; navLink.appendChild(b); }
+            b.textContent = n;
+          } else if (b) { b.remove(); }
+        }
+        document.title = (n > 0 ? '(' + n + ') ' : '') + judulAsli;
+        var dot = document.getElementById('notif-dot'); if (dot && n > 0) dot.hidden = false;
+      }
+      function toast(r){
+        var box = document.getElementById('live-toasts'), el = document.createElement('a');
+        el.className = 'live-toast'; el.href = 'kelola_permintaan';
+        el.innerHTML = '<span class="lt-ic">&#128230;</span><span class="lt-body"><b>Permintaan ATK baru</b><span>' + esc(r.detail) + '</span><em>baru saja &middot; ' + esc(r.username || '') + '</em></span><button type="button" aria-label="Tutup">&times;</button>';
+        el.querySelector('button').addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); el.remove(); });
+        box.appendChild(el);
+        setTimeout(function(){ el.classList.add('out'); setTimeout(function(){ el.remove(); }, 350); }, 12000);
+      }
+      function cek(){
+        if (document.hidden) return;
+        var after = sessionStorage.getItem(KEY); if (after === null) after = '-1';
+        fetch('notifikasi?do=live&after=' + encodeURIComponent(after), { cache: 'no-store' })
+          .then(function(r){ return r.json(); })
+          .then(function(d){
+            if (typeof d.last === 'number') sessionStorage.setItem(KEY, String(d.last));
+            (d.baru || []).forEach(toast);
+            if ((d.baru || []).length) bunyi();
+            if (typeof d.pending === 'number') setBadge(d.pending);
+          }).catch(function(){});
+      }
+      setBadge(pending); cek();
+      setInterval(cek, 5000);
+      document.addEventListener('visibilitychange', function(){ if (!document.hidden) cek(); });
+    })();
+    </script>
+    <?php endif; ?>
 
     <div class="main">
       <?php $flash = flash_get(); if ($flash): ?>
