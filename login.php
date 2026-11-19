@@ -132,6 +132,7 @@ if (!is_logged_in()) {
     $rememberedUser = remember_try_autologin($pdo);
     if ($rememberedUser) {
         session_regenerate_id(true);
+        $_SESSION['last_seen'] = time();
         $_SESSION['user'] = [
             'id' => $rememberedUser['id'],
             'username' => $rememberedUser['username'],
@@ -279,7 +280,7 @@ if ($lockRemaining > 0) {
 // Hash dummy dipakai untuk menyamakan waktu proses ketika username tidak ditemukan,
 // supaya penyerang tidak bisa menebak username valid lewat perbedaan waktu respons.
 // (Ini bukan hash akun sungguhan, hanya untuk menjaga durasi password_verify tetap konsisten.)
-const DUMMY_PASSWORD_HASH = '$2y$10$abcdefghijklmnopqrstuuOe1cQAqz8m1r1r1r1r1r1r1r1r1r1r1';
+const DUMMY_PASSWORD_HASH = '$2y$10$.FFd2h5bi0B5LhaBdUvWq.wjewtQ2sxGYdWReF56MYmNRyZIymC7.';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_check();
@@ -319,6 +320,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 // Regenerasi session ID untuk mencegah session fixation.
                 session_regenerate_id(true);
+                $_SESSION['last_seen'] = time();
                 $_SESSION['user'] = [
                     'id' => $row['id'],
                     'username' => $row['username'],

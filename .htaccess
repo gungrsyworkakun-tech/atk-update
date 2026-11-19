@@ -5,6 +5,17 @@ php_value max_execution_time 120
 php_value memory_limit 256M
 
 # ============================================================
+# KEAMANAN: file & folder yang tidak boleh dibuka lewat browser
+# ============================================================
+<FilesMatch "(?i)(\.(sql|bak|log|md|sqlite|env|ini|sh|yml|yaml|dist)$|^error_log$|^config(\.example)?\.php$|^\.git)">
+  Require all denied
+</FilesMatch>
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule ^(.*/)?(data|logs|includes|_cadangan_[^/]+|\.git)(/|$) - [F,L]
+</IfModule>
+
+# ============================================================
 # Clean URL: akses halaman tanpa akhiran .php
 # Contoh: /penitipan  -> otomatis membuka penitipan.php
 #         /penitipan.php tetap bisa diakses seperti biasa (tidak dihapus)

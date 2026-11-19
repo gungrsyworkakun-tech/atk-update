@@ -164,3 +164,11 @@ Baru: `aktivitas.php`, `includes/activity_log.php`. Diubah: `index.php`, `includ
 - Semua tombol Hapus yang berupa link kini membawa token CSRF dan dicek di server (`csrf_check_get`), jadi tidak bisa dipicu dari situs lain.
 - Semua upload file kini dicek dari ISI file (`sanitize_uploads` di bootstrap): hanya JPG/PNG/WebP/PDF asli; file menyamar (mis. .php) ditolak.
 - Header `X-Content-Type-Options: nosniff` ditambah di penayang file Penitipan dan BAST.
+
+## Keamanan login sampai dashboard (branch uji-coba)
+- Cookie sesi sekarang HttpOnly + SameSite + (Secure bila HTTPS) dan diatur SEBELUM sesi mulai (sebelumnya terlambat, tidak berefek). Mode strict session aktif.
+- Header keamanan (nosniff, frame, referrer, HSTS bila HTTPS) kini berlaku di semua halaman, bukan hanya login.
+- Keluar otomatis setelah 8 jam tidak aktif. Data akun dicek ulang ke database tiap 60 detik: akun dihapus langsung terlempar, izin yang dicabut langsung berlaku.
+- Logout kini menghapus token "ingat saya" dan cookie-nya (sebelumnya setelah logout bisa otomatis masuk lagi lewat halaman login).
+- Hash pembanding waktu di login diperbaiki (sebelumnya tidak valid sehingga username yang ada/tidak ada bisa ditebak dari waktu respons).
+- .htaccess: blokir akses browser ke folder data/, logs/, includes/, _cadangan_*, .git dan file .sql .bak .log .md error_log config*.php.
