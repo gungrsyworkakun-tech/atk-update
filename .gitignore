@@ -1,0 +1,13 @@
+# Rahasia & data pribadi: JANGAN di-upload ke GitHub
+config.php
+error_log
+*.log
+logs/
+data/
+uploads/*
+!uploads/.htaccess
+imngurah_atk*.sql
+*.bak
+.DS_Store
+Thumbs.db
+_cadangan_*/
