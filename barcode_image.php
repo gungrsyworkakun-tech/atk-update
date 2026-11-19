@@ -3,6 +3,8 @@
 ini_set("display_errors", "0");
 require __DIR__ . '/includes/bootstrap.php';
 require_permission('barcode');
+// Lepas kunci sesi: tanpa ini, gambar dimuat antre satu per satu.
+session_write_close();
 require __DIR__ . '/includes/barcode.php';
 
 $kode = $_GET['kode'] ?? '';
@@ -16,6 +18,39 @@ if (!$item) { http_response_code(404); exit('Barang tidak ditemukan.'); }
 if (!function_exists('imagepng')) {
     http_response_code(500);
     exit('Ekstensi GD belum aktif di server PHP.');
+}
+
+// ---------- Cache: gambar yang sama tidak dibuat ulang ----------
+// Nama file cache ikut berubah kalau data barang atau kode program gambar berubah.
+$cacheDir  = __DIR__ . '/uploads/barcode-cache';
+$cacheSig  = md5(implode('|', [
+    'v4', $item['kode'], $item['nama'], $item['jenis'], $item['tahun_masuk'],
+    @filemtime(__DIR__ . '/assets/1.png'), @filemtime(__DIR__ . '/includes/barcode.php'), @filemtime(__FILE__),
+]));
+$cacheFile = $cacheDir . '/' . $cacheSig . '.png';
+
+function send_barcode_png($file, $sig, $item) {
+    $etag = '"' . $sig . '"';
+    header('ETag: ' . $etag);
+    header('Cache-Control: private, max-age=86400');
+    if (($_SERVER['HTTP_IF_NONE_MATCH'] ?? '') === $etag) {
+        http_response_code(304);
+        exit;
+    }
+    if (!empty($_GET['download'])) {
+        $safeKode = preg_replace('/[^A-Za-z0-9\-_]/', '', $item['kode']);
+        $safeNama = trim(preg_replace('/[^A-Za-z0-9]+/', '-', $item['nama']), '-');
+        $filename = sprintf('%s_%s_%d.png', $safeKode, $safeNama, (int)$item['tahun_masuk']);
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+    }
+    header('Content-Type: image/png');
+    header('Content-Length: ' . filesize($file));
+    readfile($file);
+    exit;
+}
+
+if (is_file($cacheFile)) {
+    send_barcode_png($cacheFile, $cacheSig, $item);
 }
 
 ob_start();
@@ -102,6 +137,19 @@ imagecopy($final, $img, $padX, $headerH + $contentGap, 0, 0, $origW, $origH);
 $img = $final;
 // -----------------------------------------------------------------------------------------
 
+// Simpan ke cache (tulis ke file sementara dulu, supaya tidak ada file setengah jadi).
+if (is_dir($cacheDir) || @mkdir($cacheDir, 0755, true)) {
+    $tmp = $cacheFile . '.' . getmypid() . '.tmp';
+    if (@imagepng($img, $tmp)) {
+        @rename($tmp, $cacheFile);
+        if (is_file($cacheFile)) {
+            send_barcode_png($cacheFile, $cacheSig, $item);
+        }
+    }
+    @unlink($tmp);
+}
+
+// Cadangan: cache tidak bisa ditulis, kirim langsung.
 if (!empty($_GET['download'])) {
     $safeKode = preg_replace('/[^A-Za-z0-9\-_]/', '', $item['kode']);
     $safeNama = trim(preg_replace('/[^A-Za-z0-9]+/', '-', $item['nama']), '-');
