@@ -11,6 +11,14 @@ $allowedBerkasTypes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf
 /** Kalau nama barang diketik beberapa item (satu per baris di textarea, atau data lama
  *  yang masih memakai pemisah " - " dalam satu baris), tampilkan turun ke bawah satu
  *  baris per item. Kalau cuma satu item, tampil apa adanya. */
+function pn_parse_items($text) {
+    $parts = array_values(array_filter(array_map('trim', preg_split('/\r\n|\r|\n/', (string)$text)), fn($p) => $p !== ''));
+    if (count($parts) <= 1) {
+        $parts = array_values(array_filter(array_map('trim', explode(' - ', (string)$text)), fn($p) => $p !== ''));
+    }
+    return $parts ?: [trim((string)$text)];
+}
+
 function render_nama_barang($text) {
     $parts = array_values(array_filter(array_map('trim', preg_split('/\r\n|\r|\n/', $text)), fn($p) => $p !== ''));
     if (count($parts) <= 1) {
@@ -342,7 +350,7 @@ require __DIR__ . '/includes/header.php';
     display:none;align-items:flex-start;justify-content:center;padding:32px 20px;backdrop-filter:blur(3px);overflow-y:auto;}
   .pn-modal-overlay.show{display:flex;}
   .pn-modal{background:var(--paper-card);border:1px solid var(--line);border-radius:var(--radius-lg);
-    width:min(560px,100%);box-shadow:var(--shadow-pop);position:relative;margin-bottom:32px;}
+    width:min(680px,100%);box-shadow:var(--shadow-pop);position:relative;margin-bottom:32px;}
   .pn-modal-close{position:absolute;top:16px;right:16px;width:34px;height:34px;border-radius:50%;
     background:var(--paper-sunk);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;
     cursor:pointer;color:var(--text-dim);z-index:10;}
@@ -438,19 +446,10 @@ require __DIR__ . '/includes/header.php';
   }
 </style>
 
-<div class="pn-summary-card">
-  <div class="pn-summary-item">
-    <div class="pn-summary-label">Total Titipan</div>
-    <div class="pn-summary-value"><?= $totalAll ?></div>
-  </div>
-  <div class="pn-summary-item">
-    <div class="pn-summary-label">Masih Dititip</div>
-    <div class="pn-summary-value"><?= $totalDititip ?></div>
-  </div>
-  <div class="pn-summary-item">
-    <div class="pn-summary-label">Sudah Diambil</div>
-    <div class="pn-summary-value"><?= $totalDiambil ?></div>
-  </div>
+<div class="grid-stats pq-stats">
+  <div class="stat-card"><span class="stat-ic g-indigo"><?= icon('archive', 26) ?></span><span class="stat-body"><div class="val"><?= $totalAll ?></div><div class="label">Total titipan</div></span></div>
+  <div class="stat-card"><span class="stat-ic g-amber"><?= icon('clock', 26) ?></span><span class="stat-body"><div class="val"><?= $totalDititip ?></div><div class="label">Masih dititip</div></span></div>
+  <div class="stat-card"><span class="stat-ic g-green"><?= icon('user-check', 26) ?></span><span class="stat-body"><div class="val"><?= $totalDiambil ?></div><div class="label">Sudah diambil</div></span></div>
 </div>
 
 <div class="pn-toolbar">
@@ -474,100 +473,112 @@ require __DIR__ . '/includes/header.php';
 </div>
 
 <?php if ($rows): ?>
-<div class="pn-table-wrap">
-  <table class="pn-table">
-    <thead>
-      <tr>
-        <th>Penitip</th>
-        <th>Barang</th>
-        <th>Keterangan</th>
-        <th>Dokumentasi</th>
-        <th>Tgl Titip</th>
-        <th>Status</th>
-        <th>Aksi</th>
-      </tr>
-    </thead>
-    <tbody>
-      <?php foreach ($rows as $r):
-        $fotoList = $fotoByPenitipan[$r['id']] ?? [];
-        $itemJson = json_encode([
-            'id' => $r['id'], 'namaPenitip' => $r['nama_penitip'], 'kontak' => $r['kontak'],
-            'namaBarang' => $r['nama_barang'], 'jumlah' => (int)$r['jumlah'], 'satuan' => $r['satuan'],
-            'tanggalTitip' => $r['tanggal_titip'], 'keterangan' => $r['keterangan'],
-            'hasBerkas' => !empty($r['berkas']),
-            'fotos' => array_map(fn($f) => ['id' => (int)$f['id']], $fotoList),
-        ], JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE);
-      ?>
-      <tr>
-        <td data-label="Penitip">
-          <div class="pn-nama"><?= e($r['nama_penitip']) ?></div>
-          <?php if (!empty($r['kontak'])): ?><div class="pn-sub"><?= e($r['kontak']) ?></div><?php endif; ?>
-        </td>
-        <td data-label="Barang">
-          <div class="pn-nama"><?= render_nama_barang($r['nama_barang']) ?></div>
-          <div class="pn-sub"><?= (int)$r['jumlah'] ?> <?= e($r['satuan']) ?></div>
-        </td>
-        <td data-label="Keterangan" style="max-width:220px;word-break:break-word;">
-          <?= !empty($r['keterangan']) ? e($r['keterangan']) : '<span class="pn-sub">—</span>' ?>
-        </td>
-        <td data-label="Dokumentasi">
-          <div class="pn-doc-cell">
-            <?php foreach (array_slice($fotoList, 0, 3) as $f): ?>
-              <img class="pn-thumb js-view-doc" src="serve_penitipan_file.php?type=foto&foto_id=<?= (int)$f['id'] ?>"
-                   alt="Foto <?= e($r['nama_barang']) ?>"
-                   data-url="serve_penitipan_file.php?type=foto&foto_id=<?= (int)$f['id'] ?>"
-                   data-download="serve_penitipan_file.php?type=foto&foto_id=<?= (int)$f['id'] ?>&download=1"
-                   data-filename="foto-<?= e($r['nama_barang']) ?>.jpg" data-image="1" title="Lihat foto">
-            <?php endforeach; ?>
-            <?php if (count($fotoList) > 3): ?><span class="pn-sub">+<?= count($fotoList) - 3 ?> lagi</span><?php endif; ?>
-            <?php if (!empty($r['berkas'])): ?>
-              <button type="button" class="pn-doc-btn js-view-doc"
-                      data-url="serve_penitipan_file.php?type=berkas&id=<?= (int)$r['id'] ?>"
-                      data-download="serve_penitipan_file.php?type=berkas&id=<?= (int)$r['id'] ?>&download=1"
-                      data-filename="berkas-<?= e($r['nama_barang']) ?>"
-                      data-image="<?= str_ends_with(strtolower($r['berkas']), '.pdf') ? '0' : '1' ?>" title="Lihat berkas">
-                <?= icon('file', 14) ?> Berkas
-              </button>
-            <?php endif; ?>
-            <?php if (!$fotoList && empty($r['berkas'])): ?><span class="pn-sub">—</span><?php endif; ?>
-          </div>
-        </td>
-        <td data-label="Tgl Titip"><?= e(date('d M Y', strtotime($r['tanggal_titip']))) ?></td>
-        <td data-label="Status">
-          <span class="status-badge <?= penitipan_status_class($r['status']) ?>"><?= e(penitipan_status_label($r['status'])) ?></span>
-          <?php if ($r['status'] === 'diambil' && !empty($r['tanggal_diambil'])): ?>
-            <div class="pn-sub">Diambil <?= e(date('d M Y', strtotime($r['tanggal_diambil']))) ?><?= !empty($r['diambil_oleh']) ? ' oleh ' . e($r['diambil_oleh']) : '' ?></div>
-            <?php if (!empty($r['foto_pengambilan'])): ?>
-              <img class="pn-thumb js-view-doc" style="margin-top:5px;"
-                   src="serve_penitipan_file.php?type=foto_pengambilan&id=<?= (int)$r['id'] ?>"
-                   alt="Foto saat diambil"
-                   data-url="serve_penitipan_file.php?type=foto_pengambilan&id=<?= (int)$r['id'] ?>"
-                   data-download="serve_penitipan_file.php?type=foto_pengambilan&id=<?= (int)$r['id'] ?>&download=1"
-                   data-filename="foto-diambil-<?= e($r['nama_barang']) ?>.jpg" data-image="1" title="Lihat foto saat diambil">
-            <?php endif; ?>
+<div class="pn-grid">
+  <?php foreach ($rows as $r):
+    $fotoList = $fotoByPenitipan[$r['id']] ?? [];
+    $itemJson = json_encode([
+        'id' => $r['id'], 'namaPenitip' => $r['nama_penitip'], 'kontak' => $r['kontak'],
+        'namaBarang' => $r['nama_barang'], 'jumlah' => (int)$r['jumlah'], 'satuan' => $r['satuan'],
+        'tanggalTitip' => $r['tanggal_titip'], 'keterangan' => $r['keterangan'],
+        'hasBerkas' => !empty($r['berkas']),
+        'fotos' => array_map(fn($f) => ['id' => (int)$f['id']], $fotoList),
+    ], JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE);
+    $daftar = pn_parse_items($r['nama_barang']);
+    $batas = 6;
+    $diambil = $r['status'] === 'diambil';
+  ?>
+  <article class="pn-card <?= $diambil ? 'pn-done' : 'pn-wait' ?>">
+    <header class="pn-card-head">
+      <span class="pn-avatar"><?= e(mb_strtoupper(mb_substr(trim($r['nama_penitip']), 0, 1))) ?></span>
+      <div class="pn-who">
+        <b title="<?= e($r['nama_penitip']) ?>"><?= e($r['nama_penitip']) ?></b>
+        <small><?= !empty($r['kontak']) ? e($r['kontak']) : 'Tanpa kontak' ?></small>
+      </div>
+      <div class="pn-head-right">
+        <span class="status-badge <?= penitipan_status_class($r['status']) ?>"><?= e(penitipan_status_label($r['status'])) ?></span>
+        <small>Dititip <?= e(date('d M Y', strtotime($r['tanggal_titip']))) ?></small>
+      </div>
+    </header>
+
+    <div class="pn-card-body">
+      <div class="pn-sec-title"><?= icon('box', 14) ?> Barang titipan <em><?= count($daftar) > 1 ? count($daftar) . ' jenis · ' : '' ?><?= (int)$r['jumlah'] ?> <?= e($r['satuan']) ?></em></div>
+      <ul class="pn-items" data-batas="<?= $batas ?>">
+        <?php foreach ($daftar as $i => $nm): ?>
+          <li<?= $i >= $batas ? ' class="pn-more" hidden' : '' ?>><?= e($nm) ?></li>
+        <?php endforeach; ?>
+      </ul>
+      <?php if (count($daftar) > $batas): ?>
+        <button type="button" class="pn-toggle" data-more="Lihat <?= count($daftar) - $batas ?> barang lainnya" data-less="Sembunyikan">Lihat <?= count($daftar) - $batas ?> barang lainnya</button>
+      <?php endif; ?>
+
+      <?php if (!empty($r['keterangan'])): ?>
+        <div class="pn-note"><?= icon('file', 14) ?><span><?= e($r['keterangan']) ?></span></div>
+      <?php endif; ?>
+
+      <?php if ($fotoList || !empty($r['berkas'])): ?>
+      <div class="pn-doc-cell">
+        <?php foreach (array_slice($fotoList, 0, 4) as $f): ?>
+          <img class="pn-thumb js-view-doc" loading="lazy" decoding="async" src="serve_penitipan_file.php?type=foto&foto_id=<?= (int)$f['id'] ?>"
+               alt="Foto <?= e($r['nama_barang']) ?>"
+               data-url="serve_penitipan_file.php?type=foto&foto_id=<?= (int)$f['id'] ?>"
+               data-download="serve_penitipan_file.php?type=foto&foto_id=<?= (int)$f['id'] ?>&download=1"
+               data-filename="foto-penitipan-<?= (int)$r['id'] ?>.jpg" data-image="1" title="Lihat foto">
+        <?php endforeach; ?>
+        <?php if (count($fotoList) > 4): ?><span class="pn-sub">+<?= count($fotoList) - 4 ?> lagi</span><?php endif; ?>
+        <?php if (!empty($r['berkas'])): ?>
+          <button type="button" class="pn-doc-btn js-view-doc"
+                  data-url="serve_penitipan_file.php?type=berkas&id=<?= (int)$r['id'] ?>"
+                  data-download="serve_penitipan_file.php?type=berkas&id=<?= (int)$r['id'] ?>&download=1"
+                  data-filename="berkas-penitipan-<?= (int)$r['id'] ?>"
+                  data-image="<?= str_ends_with(strtolower($r['berkas']), '.pdf') ? '0' : '1' ?>" title="Lihat berkas">
+            <?= icon('file', 14) ?> Berkas
+          </button>
+        <?php endif; ?>
+      </div>
+      <?php endif; ?>
+
+      <?php if ($diambil): ?>
+        <div class="pn-taken">
+          <?= icon('user-check', 16) ?>
+          <span>Diambil <b><?= !empty($r['tanggal_diambil']) ? e(date('d M Y', strtotime($r['tanggal_diambil']))) : '-' ?></b><?= !empty($r['diambil_oleh']) ? ' oleh <b>' . e($r['diambil_oleh']) . '</b>' : '' ?></span>
+          <?php if (!empty($r['foto_pengambilan'])): ?>
+            <img class="pn-thumb js-view-doc" loading="lazy" decoding="async"
+                 src="serve_penitipan_file.php?type=foto_pengambilan&id=<?= (int)$r['id'] ?>" alt="Foto saat diambil"
+                 data-url="serve_penitipan_file.php?type=foto_pengambilan&id=<?= (int)$r['id'] ?>"
+                 data-download="serve_penitipan_file.php?type=foto_pengambilan&id=<?= (int)$r['id'] ?>&download=1"
+                 data-filename="foto-diambil-<?= (int)$r['id'] ?>.jpg" data-image="1" title="Lihat foto saat diambil">
           <?php endif; ?>
-        </td>
-        <td data-label="Aksi">
-          <div class="pn-actions">
-            <button type="button" class="btn btn-ghost js-edit" data-item='<?= $itemJson ?>'>Ubah</button>
-            <?php if ($r['status'] === 'dititip'): ?>
-              <button type="button" class="btn btn-primary js-ambil" data-id="<?= (int)$r['id'] ?>" data-nama="<?= e($r['nama_penitip']) ?>">Tandai Diambil</button>
-            <?php else: ?>
-              <form method="post" style="display:inline;" onsubmit="return confirm('Kembalikan status ke \'Masih Dititip\'?');">
-                <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
-                <input type="hidden" name="do" value="batal_ambil">
-                <input type="hidden" name="id" value="<?= (int)$r['id'] ?>">
-                <button type="submit" class="btn btn-ghost">Batalkan</button>
-              </form>
-            <?php endif; ?>
-            <a class="btn btn-ghost" style="color:var(--red);" href="penitipan.php?action=delete&id=<?= (int)$r['id'] ?>" onclick="return confirm('Hapus catatan titipan ini?');">Hapus</a>
-          </div>
-        </td>
-      </tr>
-      <?php endforeach; ?>
-    </tbody>
-  </table>
+        </div>
+      <?php endif; ?>
+    </div>
+
+    <footer class="pn-card-foot pn-actions">
+      <?php if (!$diambil): ?>
+        <button type="button" class="btn btn-primary js-ambil" data-id="<?= (int)$r['id'] ?>" data-nama="<?= e($r['nama_penitip']) ?>">Tandai Diambil</button>
+      <?php else: ?>
+        <form method="post" style="display:inline;" onsubmit="return confirm('Kembalikan status ke \'Masih Dititip\'?');">
+          <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+          <input type="hidden" name="do" value="batal_ambil">
+          <input type="hidden" name="id" value="<?= (int)$r['id'] ?>">
+          <button type="submit" class="btn btn-ghost">Batalkan</button>
+        </form>
+      <?php endif; ?>
+      <button type="button" class="btn btn-ghost js-edit" data-item='<?= $itemJson ?>'>Ubah</button>
+      <a class="btn btn-ghost pn-del" href="penitipan.php?action=delete&id=<?= (int)$r['id'] ?>" onclick="return confirm('Hapus catatan titipan ini?');">Hapus</a>
+    </footer>
+  </article>
+  <?php endforeach; ?>
 </div>
+<script>
+document.querySelectorAll('.pn-toggle').forEach(function (b) {
+  b.addEventListener('click', function () {
+    var ul = b.previousElementSibling, open = b.dataset.open === '1';
+    ul.querySelectorAll('.pn-more').forEach(function (li) { li.hidden = open; });
+    b.dataset.open = open ? '0' : '1';
+    b.textContent = open ? b.dataset.more : b.dataset.less;
+  });
+});
+</script>
 <?php else: ?>
   <div class="empty"><b>Belum ada data</b><?= ($q !== '' || $statusFilter !== '') ? 'Tidak ada titipan yang cocok dengan pencarian/filter ini.' : 'Belum ada barang yang dititipkan. Klik "Catat Titipan Baru" untuk menambahkan.' ?></div>
 <?php endif; ?>
@@ -589,9 +600,10 @@ require __DIR__ . '/includes/header.php';
       <input type="hidden" name="id" id="pnInputId">
       <input type="hidden" name="return_q" value="<?= e($q) ?>">
       <div class="pn-modal-body">
+        <div class="pn-sec-h"><span>1</span> Data penitip</div>
         <div class="pn-field-row">
           <div class="pn-field">
-            <label class="pn-label">Nama Penitip *</label>
+            <label class="pn-label">Nama penitip <i>*</i></label>
             <input class="pn-input" type="text" name="nama_penitip" id="pnNamaPenitip" required placeholder="cth. Budi (TIKKIM)">
           </div>
           <div class="pn-field">
@@ -599,44 +611,46 @@ require __DIR__ . '/includes/header.php';
             <input class="pn-input" type="text" name="kontak" id="pnKontak" placeholder="No. HP / unit kerja">
           </div>
         </div>
+
+        <div class="pn-sec-h"><span>2</span> Barang yang dititip</div>
         <div class="pn-field">
-          <label class="pn-label">Nama Barang *</label>
+          <label class="pn-label">Nama barang <i>*</i></label>
           <textarea class="pn-input pn-textarea" name="nama_barang" id="pnNamaBarang" required rows="3" placeholder="Satu barang per baris, misal:&#10;Kabel UTP 1 Roll&#10;Patch cord 2 buah"></textarea>
           <div class="pn-upload-hint">Tekan Enter untuk barang berikutnya kalau lebih dari satu.</div>
         </div>
-        <div class="pn-field-row">
+        <div class="pn-field-row pn-row3">
           <div class="pn-field">
-            <label class="pn-label">Jumlah</label>
+            <label class="pn-label">Jumlah total</label>
             <input class="pn-input" type="number" min="1" name="jumlah" id="pnJumlah" value="1">
           </div>
           <div class="pn-field">
             <label class="pn-label">Satuan</label>
             <input class="pn-input" type="text" name="satuan" id="pnSatuan" value="pcs">
           </div>
-        </div>
-        <div class="pn-field">
-          <label class="pn-label">Tanggal Titip</label>
-          <input class="pn-input" type="date" name="tanggal_titip" id="pnTanggalTitip">
+          <div class="pn-field">
+            <label class="pn-label">Tanggal titip</label>
+            <input class="pn-input" type="date" name="tanggal_titip" id="pnTanggalTitip">
+          </div>
         </div>
         <div class="pn-field">
           <label class="pn-label">Keterangan</label>
-          <input class="pn-input" type="text" name="keterangan" id="pnKeterangan" placeholder="Catatan tambahan, opsional">
+          <input class="pn-input" type="text" name="keterangan" id="pnKeterangan" placeholder="Lokasi simpan / catatan tambahan (opsional)">
         </div>
 
+        <div class="pn-sec-h"><span>3</span> Dokumentasi <em>opsional</em></div>
         <div class="pn-field">
-          <label class="pn-label">Foto Dokumentasi</label>
+          <label class="pn-label">Foto</label>
           <div class="pn-foto-grid" id="pnFotoGrid"></div>
-          <label class="btn btn-ghost" for="pnFotoInput" style="cursor:pointer;font-size:11.5px;padding:7px 10px;display:inline-block;width:fit-content;">+ Tambah Foto</label>
+          <label class="pn-drop" for="pnFotoInput"><?= icon('plus', 18) ?><b>Tambah foto</b><span>JPG/PNG/WebP, maks 2 MB per foto. Boleh pilih beberapa sekaligus.</span></label>
           <input type="file" name="foto[]" id="pnFotoInput" accept="image/jpeg,image/png,image/webp" multiple style="display:none;">
-          <div class="pn-upload-hint">JPG/PNG/WebP, maks 2 MB per foto — bisa pilih beberapa sekaligus. Kalau tombol X ditekan, semua foto dari 1x pemilihan yang sama akan ikut terbatalkan.</div>
         </div>
         <div class="pn-field">
-          <label class="pn-label">Berkas Pendukung</label>
+          <label class="pn-label">Berkas pendukung</label>
           <div class="pn-upload-box pn-upload-box-file" id="pnBerkasBox">
             <div id="pnBerkasEmpty" class="pn-upload-placeholder"><?= icon('file', 26) ?><span>Belum ada berkas</span></div>
             <a id="pnBerkasCurrent" href="#" target="_blank" class="pn-doc-btn" style="display:none;"><?= icon('file', 14) ?> Lihat berkas saat ini</a>
           </div>
-          <label class="btn btn-ghost" for="pnBerkasInput" style="cursor:pointer;font-size:11.5px;padding:7px 10px;display:inline-block;width:fit-content;">Pilih Berkas</label>
+          <label class="btn btn-ghost" for="pnBerkasInput" style="cursor:pointer;font-size:12px;padding:7px 12px;display:inline-block;width:fit-content;">Pilih berkas</label>
           <input type="file" name="berkas" id="pnBerkasInput" accept="image/jpeg,image/png,image/webp,application/pdf" style="display:none;">
           <div class="pn-upload-hint">PDF/JPG/PNG, maks 5 MB</div>
           <label class="pn-hapus-check" id="pnHapusBerkasWrap" style="display:none;">

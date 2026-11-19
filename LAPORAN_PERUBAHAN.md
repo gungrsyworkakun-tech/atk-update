@@ -154,3 +154,8 @@ Baru: `aktivitas.php`, `includes/activity_log.php`. Diubah: `index.php`, `includ
    Pakai `--with-freetype` supaya tulisan barcode memakai font TTF. Tanpa itu tulisan jatuh ke font bawaan yang kecil.
 2. **Ganti API key AI** kalau kode lama pernah bisa dilihat orang lain.
 3. Coba "Cetak Semua Barcode" dan pastikan pas 4 per kertas.
+
+## Tahap 3 – Bagian 6: Penitipan ATK dirapikan
+- Tabel diganti kartu per titipan: penitip + kontak, status, daftar barang dalam 2 kolom (maks 6, sisanya "Lihat barang lainnya"), keterangan, foto/berkas, info pengambilan.
+- Ringkasan jadi 3 kartu statistik; tombol aksi rapi (Tandai Diambil / Ubah / Hapus).
+- Form Catat/Ubah titipan dibuat 3 langkah (Data penitip, Barang, Dokumentasi) dengan header berwarna dan area unggah foto.
