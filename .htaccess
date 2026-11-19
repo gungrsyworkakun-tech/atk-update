@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Menaikkan batas ukuran upload & POST agar foto (base64) tidak terpotong
 php_value upload_max_filesize 20M
 php_value post_max_size 25M
@@ -21,3 +22,28 @@ php_value memory_limit 256M
   RewriteCond %{REQUEST_FILENAME}\.php -f
   RewriteRule ^([^.]+)$ $1.php [L]
 </IfModule>
+=======
+# Menaikkan batas ukuran upload & POST agar foto (base64) tidak terpotong
+php_value upload_max_filesize 20M
+php_value post_max_size 25M
+php_value max_execution_time 120
+php_value memory_limit 256M
+
+# ============================================================
+# Clean URL: akses halaman tanpa akhiran .php
+# Contoh: /penitipan  -> otomatis membuka penitipan.php
+#         /penitipan.php tetap bisa diakses seperti biasa (tidak dihapus)
+# ============================================================
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Kalau yang diminta memang file/folder asli (termasuk file .php langsung), biarkan apa adanya
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # Kalau path tanpa ekstensi cocok dengan file .php yang ada, arahkan (internal) ke file itu
+  RewriteCond %{REQUEST_FILENAME}\.php -f
+  RewriteRule ^([^.]+)$ $1.php [L]
+</IfModule>
+>>>>>>> c4b6d0b6986dcde8c8953360eb9a4309802908c5
