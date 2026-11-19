@@ -983,3 +983,44 @@ html.theme-anim,html.theme-anim *{transition:background-color .2s,border-color .
 .ib-it-txt{display:flex;flex-direction:column;min-width:0;font-size:12.5px;line-height:1.3}
 .ib-it-txt b{font-size:13px}
 .ib-it-txt span{color:var(--text-dim)}
+
+/* ============ Kalender pengambilan ============ */
+.live-toast.warn{border-left-color:#DC2626}
+.live-toast.warn .lt-ic{background:var(--red-light)}
+.kal-wrap{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(320px,1fr);gap:18px;align-items:start}
+@media (max-width:980px){.kal-wrap{grid-template-columns:1fr}}
+.kal-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.kal-head h3{margin:0 8px;min-width:150px;text-align:center}
+.kal-filter{margin-left:auto}.kal-filter select{padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--text)}
+.kal-legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12px;color:var(--text-dim);margin-bottom:12px}
+.kal-legend span{display:inline-flex;align-items:center;gap:6px}
+.d{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--text-faint)}
+.d-selesai{background:#12A67F}.d-bast{background:#DC2626}.d-diproses{background:#4c8cff}.d-menunggu{background:#F59E0B}.d-ditolak{background:#9CA3AF}
+.kal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.kal-dow{text-align:center;font-size:11.5px;font-weight:700;color:var(--text-faint);padding:6px 0;letter-spacing:.04em}
+.kal-cell{min-height:86px;border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:8px;display:flex;flex-direction:column;align-items:flex-start;gap:5px;
+  text-align:left;cursor:default;font:inherit;color:var(--text);transition:border-color .15s,box-shadow .15s,background .15s}
+.kal-empty{border:0;background:none}
+.kal-has{cursor:pointer}.kal-has:hover{border-color:var(--accent);box-shadow:var(--shadow-card)}
+.kal-cell:not(.kal-has):not(.kal-empty){background:var(--paper)}
+.kal-num{font-weight:700;font-size:13px}
+.kal-today .kal-num{background:var(--orange);color:#fff;border-radius:999px;min-width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;padding:0 6px}
+.kal-sel{border-color:var(--accent)!important;box-shadow:0 0 0 3px var(--focus-ring)!important}
+.kal-dots{display:flex;gap:4px;align-items:center}.kal-dots em{font-style:normal;font-size:10.5px;color:var(--text-dim)}
+.kal-count{font-size:11px;color:var(--text-dim)}
+@media (max-width:640px){.kal-cell{min-height:58px;padding:5px}.kal-count{display:none}.kal-head h3{min-width:0}}
+.kal-panel{position:sticky;top:84px}
+.kp-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px}.kp-head h3{margin:0}.kp-head span{font-size:12.5px;color:var(--text-dim)}
+.kp-req{border:1px solid var(--line);border-left:4px solid var(--line-strong);border-radius:14px;padding:12px 14px;margin-bottom:12px;background:var(--surface)}
+.kp-req.st-card-menunggu{border-left-color:#F59E0B}.kp-req.st-card-diproses{border-left-color:#4c8cff}.kp-req.st-card-selesai{border-left-color:#12A67F}.kp-req.st-card-ditolak{border-left-color:#9CA3AF}
+.kp-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;font-size:13.5px}
+.kp-sub{font-size:12px;color:var(--text-dim);margin-top:2px}
+.kal-pill{font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:999px;white-space:nowrap;color:#fff}
+.kal-pill.d-selesai{background:#12A67F}.kal-pill.d-bast{background:#DC2626}.kal-pill.d-diproses{background:#4c8cff}.kal-pill.d-menunggu{background:#F59E0B}.kal-pill.d-ditolak{background:#9CA3AF}
+.kp-items{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.kp-item{display:flex;align-items:center;gap:10px;font-size:13px}
+.kp-item img,.kp-noimg{width:42px;height:42px;border-radius:9px;object-fit:cover;background:var(--paper);border:1px solid var(--line);flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.kp-item span{display:flex;flex-direction:column;line-height:1.3}.kp-item em{font-style:normal;color:var(--text-dim);font-size:12px}
+.kp-foot{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:12px;padding-top:10px;border-top:1px solid var(--line-soft)}
+.kp-bast{font-size:12px;font-weight:600;margin-right:auto}.kp-bast.ok{color:var(--teal-dark)}.kp-bast.no{color:var(--red)}
+.bast-remind{display:block}
