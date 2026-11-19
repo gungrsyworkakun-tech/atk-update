@@ -54,6 +54,18 @@ $stmt = $pdo->prepare('SELECT * FROM permintaan WHERE user_id = ? ORDER BY creat
 $stmt->execute([$u['id']]);
 $myRequests = $stmt->fetchAll();
 
+// Rincian barang tiap permintaan, supaya jelas pada tanggal itu barang apa saja yang diambil.
+$itemsByReq = [];
+if ($myRequests) {
+    $ids = array_column($myRequests, 'id');
+    $in = implode(',', array_fill(0, count($ids), '?'));
+    $st = $pdo->prepare("SELECT pi.*, i.foto AS foto_barang, i.satuan AS satuan_barang
+                         FROM permintaan_items pi LEFT JOIN items i ON i.id = pi.item_id
+                         WHERE pi.permintaan_id IN ($in) ORDER BY pi.id");
+    $st->execute($ids);
+    foreach ($st->fetchAll() as $row) $itemsByReq[$row['permintaan_id']][] = $row;
+}
+
 require __DIR__ . '/includes/header.php';
 ?>
 <style>
@@ -77,7 +89,7 @@ require __DIR__ . '/includes/header.php';
 ?>
   <div class="ib-card">
     <div class="ib-info">
-      <div class="ib-date"><?= e(date('d M Y', strtotime($r['tanggal']))) ?></div>
+      <div class="ib-date">Permintaan #<?= (int)$r['id'] ?> <span class="pq-dim">&middot; <?= e(date('d M Y', strtotime($r['tanggal']))) ?></span></div>
       <div class="ib-sub">Status: <?= e(permintaan_status_label($r['status'])) ?> · <?= $hasFile ? e($r['bast_file']) : 'Belum ada berkas' ?></div>
     </div>
     <div class="ib-actions">
@@ -95,6 +107,17 @@ require __DIR__ . '/includes/header.php';
         <input type="file" name="berkas" accept="application/pdf,image/*" required>
         <button class="btn btn-primary" style="font-size:12px;padding:6px 10px;" type="submit"><?= $hasFile ? 'Ganti' : 'Unggah' ?></button>
       </form>
+    </div>
+    <div class="ib-items">
+      <?php foreach ($itemsByReq[$r['id']] ?? [] as $it): ?>
+        <div class="ib-item">
+          <?php if (!empty($it['foto_barang']) && !empty($it['item_id'])): ?>
+            <img loading="lazy" decoding="async" alt="" onerror="this.onerror=null;this.src='serve_foto_barang.php?id=<?= (int)$it['item_id'] ?>'"
+                 src="serve_foto_barang.php?id=<?= (int)$it['item_id'] ?>&thumb=1&v=<?= urlencode($it['foto_barang']) ?>">
+          <?php else: ?><span class="ib-noimg"><?= icon('box', 18) ?></span><?php endif; ?>
+          <span class="ib-it-txt"><b><?= e($it['nama_barang']) ?></b><span><?= (int)$it['jumlah'] ?> <?= e($it['satuan_barang'] ?: 'pcs') ?><?php if (!empty($it['keterangan_satuan'])): ?> (<?= e($it['keterangan_satuan']) ?>)<?php endif; ?></span></span>
+        </div>
+      <?php endforeach; ?>
     </div>
   </div>
 <?php endforeach; endif; ?>
