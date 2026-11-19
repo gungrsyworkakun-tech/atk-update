@@ -960,3 +960,16 @@ html.theme-anim,html.theme-anim *{transition:background-color .2s,border-color .
 .st-diproses{background:rgba(76,140,255,.15);color:#4c8cff}
 .st-badge{padding:5px 12px;font-size:12px;font-weight:700;border-radius:999px}
 @media (max-width:640px){.is-bidang .topline{padding:20px 18px}.pq-steps li .lbl{font-size:11px}}
+
+/* Daftar barang permintaan dengan foto (untuk acuan ambil di gudang) */
+.pq-pick{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px;margin-top:14px}
+.pick-item{display:flex;gap:12px;align-items:center;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:10px}
+.pick-photo{width:84px;height:84px;border-radius:12px;overflow:hidden;flex-shrink:0;background:var(--surface);border:1px solid var(--line);padding:0;cursor:zoom-in;
+  display:flex;align-items:center;justify-content:center;color:var(--text-faint)}
+.pick-photo img{width:100%;height:100%;object-fit:cover;display:block}
+.pick-none{cursor:default}
+.pick-info{min-width:0}
+.pick-name{font-weight:700;font-size:13.5px;line-height:1.3}
+.pick-qty{margin-top:3px;font-size:13px;color:var(--text-dim)}
+.pick-qty b{font-size:16px;color:var(--accent)}
+.pick-meta{margin-top:4px;font-size:11px;color:var(--text-faint)}

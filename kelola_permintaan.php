@@ -119,7 +119,9 @@ $itemsByReq = [];
 if ($rows) {
     $ids = array_column($rows, 'id');
     $in = implode(',', array_fill(0, count($ids), '?'));
-    $stmt = $pdo->prepare("SELECT * FROM permintaan_items WHERE permintaan_id IN ($in) ORDER BY id");
+    $stmt = $pdo->prepare("SELECT pi.*, i.foto AS foto_barang, i.kode AS kode_barang, i.stok AS stok_barang, i.satuan AS satuan_barang
+                           FROM permintaan_items pi LEFT JOIN items i ON i.id = pi.item_id
+                           WHERE pi.permintaan_id IN ($in) ORDER BY pi.id");
     $stmt->execute($ids);
     foreach ($stmt->fetchAll() as $row) $itemsByReq[$row['permintaan_id']][] = $row;
 }
@@ -166,16 +168,28 @@ require __DIR__ . '/includes/header.php';
       </div>
     </div>
 
-    <ul class="pq-items">
+    <div class="pq-pick">
       <?php foreach ($itemsByReq[$r['id']] ?? [] as $it): ?>
-       <li>
-          <?= e($it['nama_barang']) ?> — <b><?= (int)$it['jumlah'] ?></b> pcs
-          <?php if (!empty($it['keterangan_satuan'])): ?>
-            <span class="unit-note">(diajukan: <?= e($it['keterangan_satuan']) ?>)</span>
+        <div class="pick-item">
+          <?php if (!empty($it['foto_barang']) && !empty($it['item_id'])): $fotoUrl = 'serve_foto_barang.php?id=' . (int)$it['item_id']; ?>
+            <button type="button" class="pick-photo js-view-doc" title="Klik untuk memperbesar"
+              data-url="<?= $fotoUrl ?>&v=<?= urlencode($it['foto_barang']) ?>" data-download="<?= $fotoUrl ?>" data-filename="<?= e($it['nama_barang']) ?>" data-image="1">
+              <img loading="lazy" decoding="async" alt="<?= e($it['nama_barang']) ?>"
+                   onerror="this.onerror=null;this.src='<?= $fotoUrl ?>'"
+                   src="<?= $fotoUrl ?>&thumb=1&v=<?= urlencode($it['foto_barang']) ?>">
+            </button>
+          <?php else: ?>
+            <span class="pick-photo pick-none"><?= icon('box', 26) ?></span>
           <?php endif; ?>
-        </li>
+          <div class="pick-info">
+            <div class="pick-name"><?= e($it['nama_barang']) ?></div>
+            <div class="pick-qty"><b><?= (int)$it['jumlah'] ?></b> <?= e($it['satuan_barang'] ?: 'pcs') ?>
+              <?php if (!empty($it['keterangan_satuan'])): ?><span class="unit-note">(diajukan: <?= e($it['keterangan_satuan']) ?>)</span><?php endif; ?></div>
+            <?php if (!empty($it['kode_barang'])): ?><div class="pick-meta mono"><?= e($it['kode_barang']) ?><?php if ($it['stok_barang'] !== null): ?> &middot; sisa stok <?= (int)$it['stok_barang'] ?><?php endif; ?></div><?php endif; ?>
+          </div>
+        </div>
       <?php endforeach; ?>
-    </ul>
+    </div>
 
     <?php if ($r['bast_file']): ?>
       <div style="margin-top:10px;">
