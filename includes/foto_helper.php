@@ -16,20 +16,24 @@ function foto_thumb_path($fotoDir, $namaFile) {
  */
 function foto_buat_thumb($src, $dst, $maxSide = 480) {
     if (!function_exists('imagewebp') || !function_exists('imagecreatetruecolor')) return false;
+    try { return foto_buat_thumb_aman($src, $dst, $maxSide); } catch (Throwable $e) { error_log('thumb: ' . $e->getMessage()); return false; }
+}
+
+function foto_buat_thumb_aman($src, $dst, $maxSide) {
 
     $info = @getimagesize($src);
     if (!$info) return false;
     $w = (int)$info[0];
     $h = (int)$info[1];
     $type = $info[2];
-    if ($w < 1 || $h < 1 || ($w * $h) > 40000000) return false; // terlalu besar, hindari kehabisan memori
+    if ($w < 1 || $h < 1 || ($w * $h) > 24000000) return false; // terlalu besar, hindari kehabisan memori
 
     @ini_set('memory_limit', '256M');
 
     switch ($type) {
-        case IMAGETYPE_JPEG: $img = @imagecreatefromjpeg($src); break;
-        case IMAGETYPE_PNG:  $img = @imagecreatefrompng($src);  break;
-        case IMAGETYPE_WEBP: $img = @imagecreatefromwebp($src); break;
+        case IMAGETYPE_JPEG: if (!function_exists('imagecreatefromjpeg')) return false; $img = @imagecreatefromjpeg($src); break;
+        case IMAGETYPE_PNG:  if (!function_exists('imagecreatefrompng')) return false;  $img = @imagecreatefrompng($src);  break;
+        case IMAGETYPE_WEBP: if (!function_exists('imagecreatefromwebp')) return false; $img = @imagecreatefromwebp($src); break;
         default: return false;
     }
     if (!$img) return false;

@@ -1,6 +1,7 @@
 <?php
 // Bersihkan buffer output apa pun yang mungkin sudah terlanjur keluar
 // (mis. whitespace/BOM dari file yang di-require) sebelum kirim header gambar.
+ini_set('display_errors', '0');
 while (ob_get_level() > 0) { ob_end_clean(); }
 
 // Cegah PHP menambah header "Pragma: no-cache" & "Expires: 1981" yang membuat browser

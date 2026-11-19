@@ -356,7 +356,7 @@ require __DIR__ . '/includes/header.php';
       <div class="db-card js-open-detail" data-item='<?= $itemJson ?>'>
         <div class="db-photo">
           <?php if (!empty($it['foto'])): ?>
-            <img loading="lazy" decoding="async" src="serve_foto_barang.php?id=<?= (int)$it['id'] ?>&thumb=1&v=<?= urlencode((string)($it['foto'] ?? '')) ?>" alt="Foto <?= e($it['nama']) ?>">
+            <img loading="lazy" decoding="async" onerror="this.onerror=null;this.src='serve_foto_barang.php?id=<?= (int)$it['id'] ?>'" src="serve_foto_barang.php?id=<?= (int)$it['id'] ?>&thumb=1&v=<?= urlencode((string)($it['foto'] ?? '')) ?>" alt="Foto <?= e($it['nama']) ?>">
           <?php else: ?>
             <div class="db-photo-placeholder"><?= icon('box', 30) ?></div>
           <?php endif; ?>
