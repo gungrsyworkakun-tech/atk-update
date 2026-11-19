@@ -38,7 +38,7 @@ require __DIR__ . '/includes/header.php';
 </form>
 
 <?php if (!$operSiap): ?>
-  <div class="card" style="border-color:#B45309;"><div class="empty" style="color:#B45309;">Tombol "Oper ke bidang" belum aktif. Jalankan file <b>db tambahan/migrasi_oper_bidang.sql</b> di phpMyAdmin satu kali.</div></div>
+  <div class="card" style="border-color:var(--ochre-dark);"><div class="empty" style="color:var(--ochre-dark);">Tombol "Oper ke bidang" belum aktif. Jalankan file <b>db tambahan/migrasi_oper_bidang.sql</b> di phpMyAdmin satu kali.</div></div>
 <?php endif; ?>
 
 <?php if (!$byBidang): ?>
@@ -56,7 +56,7 @@ require __DIR__ . '/includes/header.php';
         <h3 style="margin:0;">Ke <?= e($o['bidang_nama']) ?> <span style="font-size:12px;font-weight:500;color:var(--text-dim);">(<?= e($o['username'] ?? '-') ?>)</span></h3>
         <div style="font-size:12px;color:var(--text-dim);margin-top:2px;">
           <?= e(tgl_indo(substr((string)$o['created_at'], 0, 10))) ?> · oleh <?= e($o['dibuat_oleh_nama'] ?: '-') ?> ·
-          <?= (int)$o['dibaca'] ? 'sudah dibuka bidang' : '<b style="color:#B45309;">belum dibuka bidang</b>' ?>
+          <?= (int)$o['dibaca'] ? 'sudah dibuka bidang' : '<b style="color:var(--ochre-dark);">belum dibuka bidang</b>' ?>
           <?php if (!empty($o['catatan'])): ?> · <?= e($o['catatan']) ?><?php endif; ?>
         </div>
       </div>
@@ -64,7 +64,7 @@ require __DIR__ . '/includes/header.php';
         <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
         <input type="hidden" name="aksi" value="hapus_kiriman">
         <input type="hidden" name="id" value="<?= (int)$o['id'] ?>">
-        <button type="submit" class="btn btn-ghost" style="font-size:12px;padding:6px 12px;color:#DC2626;">Hapus kiriman</button>
+        <button type="submit" class="btn btn-ghost" style="font-size:12px;padding:6px 12px;color:var(--red);">Hapus kiriman</button>
       </form>
     </div>
     <table>
@@ -80,7 +80,7 @@ require __DIR__ . '/includes/header.php';
               <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
               <input type="hidden" name="aksi" value="hapus_item">
               <input type="hidden" name="id" value="<?= (int)$it['id'] ?>">
-              <button type="submit" class="btn btn-ghost" style="font-size:11.5px;padding:4px 10px;color:#DC2626;">Hapus</button>
+              <button type="submit" class="btn btn-ghost" style="font-size:11.5px;padding:4px 10px;color:var(--red);">Hapus</button>
             </form>
           </td>
         </tr>

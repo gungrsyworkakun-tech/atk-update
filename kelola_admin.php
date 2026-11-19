@@ -22,6 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['do'] ?? '') === 'create') 
             $hash = password_hash($password, PASSWORD_DEFAULT);
             $pdo->prepare('INSERT INTO users (username, password, role, permissions) VALUES (?,?,?,?)')
                 ->execute([$username, $hash, 'admin', json_encode($perms)]);
+            log_activity($pdo, 'akun', 'tambah', 'Admin ' . $username);
             flash_set('Admin baru ditambahkan.');
         }
     }
@@ -34,6 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['do'] ?? '') === 'update_pe
     $perms = [];
     foreach (array_keys(MODULES) as $key) $perms[$key] = isset($_POST['perm'][$key]);
     $pdo->prepare('UPDATE users SET permissions = ? WHERE id = ? AND role = "admin"')->execute([json_encode($perms), $id]);
+    log_activity($pdo, 'akun', 'ubah', 'Hak akses admin #' . $id);
     flash_set('Hak akses admin diperbarui.');
     redirect('kelola_admin.php');
 }
@@ -55,6 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['do'] ?? '') === 'create_bi
             $hash = password_hash($password, PASSWORD_DEFAULT);
             $pdo->prepare('INSERT INTO users (username, password, role, bidang_nama) VALUES (?,?,?,?)')
                 ->execute([$username, $hash, 'bidang', $bidangNama]);
+            log_activity($pdo, 'akun', 'tambah', 'Admin bidang ' . $username . ' (' . $bidangNama . ')');
             flash_set('Akun Admin Bidang ditambahkan.');
         }
     }
@@ -63,12 +66,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['do'] ?? '') === 'create_bi
 
 if (($_GET['action'] ?? '') === 'delete' && isset($_GET['id'])) {
     $pdo->prepare('DELETE FROM users WHERE id = ? AND role = "admin"')->execute([$_GET['id']]);
+    log_activity($pdo, 'akun', 'hapus', 'Admin #' . (int)$_GET['id']);
     flash_set('Admin dihapus.');
     redirect('kelola_admin.php');
 }
 
 if (($_GET['action'] ?? '') === 'delete_bidang' && isset($_GET['id'])) {
     $pdo->prepare('DELETE FROM users WHERE id = ? AND role = "bidang"')->execute([$_GET['id']]);
+    log_activity($pdo, 'akun', 'hapus', 'Admin bidang #' . (int)$_GET['id']);
     flash_set('Akun Admin Bidang dihapus.');
     redirect('kelola_admin.php');
 }

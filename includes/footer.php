@@ -23,8 +23,8 @@
   .docv-title{font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .docv-toolbar-actions{display:flex;align-items:center;gap:8px;flex-shrink:0;}
   .docv-toolbar-actions .btn{font-size:12.5px;padding:7px 14px;}
-  .docv-body{flex:1;background:#E9EBF2;display:flex;align-items:center;justify-content:center;overflow:auto;}
-  .docv-frame{width:100%;height:100%;border:none;background:#E9EBF2;}
+  .docv-body{flex:1;background:var(--docv-bg);display:flex;align-items:center;justify-content:center;overflow:auto;}
+  .docv-frame{width:100%;height:100%;border:none;background:var(--docv-bg);}
   .docv-img{max-width:100%;max-height:100%;object-fit:contain;}
 </style>
 
@@ -199,6 +199,19 @@
       });
     });
   })();
+</script>
+<script>
+// Tombol ganti tema terang/gelap (disimpan di browser, default terang).
+(function(){
+  var btn=document.getElementById('theme-btn'); if(!btn) return;
+  btn.addEventListener('click',function(){
+    var root=document.documentElement, dark=root.getAttribute('data-theme')==='dark';
+    root.classList.add('theme-anim');
+    if(dark){root.removeAttribute('data-theme');} else {root.setAttribute('data-theme','dark');}
+    try{localStorage.setItem('atk-theme',dark?'light':'dark');}catch(e){}
+    setTimeout(function(){root.classList.remove('theme-anim');},300);
+  });
+})();
 </script>
 </body>
 </html>

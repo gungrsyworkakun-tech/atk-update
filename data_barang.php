@@ -74,6 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['do'] ?? '') === 'save') {
 
     $pdo->beginTransaction();
     try {
+        $wasEdit = (bool)$id;
         if ($id) {
             if ($fotoBaru) {
                 $stmt = $pdo->prepare('UPDATE items SET kode=?, nama=?, jenis=?, satuan=?, stok=?, stok_minimum=?, harga=?, tahun_masuk=?, foto=? WHERE id=?');
@@ -119,6 +120,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['do'] ?? '') === 'save') {
         }
 
         $pdo->commit();
+        log_activity($pdo, 'barang', $wasEdit ? 'ubah' : 'tambah', $nama . ' (' . $kode . ') · stok ' . $stok);
         if ($fotoUntukHapus && is_file($fotoDir . $fotoUntukHapus)) @unlink($fotoDir . $fotoUntukHapus);
 
         flash_set('Barang berhasil disimpan.');
@@ -135,12 +137,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['do'] ?? '') === 'save') {
 
 if (($_GET['action'] ?? '') === 'delete_satuan' && isset($_GET['id']) && isset($_GET['item_id'])) {
     $pdo->prepare('DELETE FROM item_satuan WHERE id = ? AND item_id = ?')->execute([$_GET['id'], $_GET['item_id']]);
+    log_activity($pdo, 'barang', 'ubah', 'Hapus satuan turunan barang #' . (int)$_GET['item_id']);
     flash_set('Satuan turunan dihapus.');
     redirect('data_barang.php');
 }
 
 if (($_GET['action'] ?? '') === 'delete' && isset($_GET['id'])) {
+    $nmQ = $pdo->prepare('SELECT nama, kode FROM items WHERE id = ?'); $nmQ->execute([$_GET['id']]); $nmR = $nmQ->fetch();
     $pdo->prepare('DELETE FROM items WHERE id = ?')->execute([$_GET['id']]);
+    log_activity($pdo, 'barang', 'hapus', $nmR ? ($nmR['nama'] . ' (' . $nmR['kode'] . ')') : ('Barang #' . (int)$_GET['id']));
     flash_set('Barang dihapus.');
     redirect('data_barang.php');
 }
@@ -173,7 +178,7 @@ require __DIR__ . '/includes/header.php';
   .db-summary-item{display:flex;flex-direction:column;}
   .db-summary-label{font-size:11px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:.05em;}
   .db-summary-value{font-family:'Plus Jakarta Sans',sans-serif;font-size:22px;font-weight:700;margin-top:3px;}
-  .db-summary-value.danger{color:#DC2626;}
+  .db-summary-value.danger{color:var(--red);}
 
   .db-toolbar{display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap;}
   .db-search{flex:1;min-width:220px;position:relative;}
@@ -289,7 +294,7 @@ require __DIR__ . '/includes/header.php';
   .db-unit-row-text{flex:1;color:var(--text-dim);}
   .db-unit-row-remove{border:none;background:transparent;color:var(--text-faint);cursor:pointer;font-size:14px;
     padding:2px 6px;border-radius:6px;flex-shrink:0;}
-  .db-unit-row-remove:hover{background:rgba(220,38,38,.10);color:#DC2626;}
+  .db-unit-row-remove:hover{background:rgba(220,38,38,.10);color:var(--red);}
   .db-unit-empty{font-size:11.5px;color:var(--text-faint);font-style:italic;padding:2px 0 8px;}
   .db-unit-add-row{display:flex;gap:8px;align-items:center;}
   .db-unit-add-row input{padding:8px 10px;border:1.5px solid var(--line);border-radius:8px;background:var(--paper-card);
@@ -351,7 +356,7 @@ require __DIR__ . '/includes/header.php';
       <div class="db-card js-open-detail" data-item='<?= $itemJson ?>'>
         <div class="db-photo">
           <?php if (!empty($it['foto'])): ?>
-            <img src="serve_foto_barang.php?id=<?= (int)$it['id'] ?>" alt="Foto <?= e($it['nama']) ?>">
+            <img loading="lazy" decoding="async" src="serve_foto_barang.php?id=<?= (int)$it['id'] ?>&thumb=1&v=<?= urlencode((string)($it['foto'] ?? '')) ?>" alt="Foto <?= e($it['nama']) ?>">
           <?php else: ?>
             <div class="db-photo-placeholder"><?= icon('box', 30) ?></div>
           <?php endif; ?>
@@ -520,7 +525,7 @@ require __DIR__ . '/includes/header.php';
       </div>
 
       <div class="db-modal-footer">
-        <a href="#" class="btn btn-ghost" id="dbModalHapusBtn" style="display:none; color:#DC2626;" onclick="return confirm('Yakin ingin menghapus barang ini? Riwayat transaksi terkait ikut terhapus.');">Hapus Barang</a>
+        <a href="#" class="btn btn-ghost" id="dbModalHapusBtn" style="display:none; color:var(--red);" onclick="return confirm('Yakin ingin menghapus barang ini? Riwayat transaksi terkait ikut terhapus.');">Hapus Barang</a>
         <div class="db-modal-footer-right">
           <button type="button" class="btn btn-ghost" id="dbModalCancelBtn">Batal</button>
           <button type="submit" class="btn btn-primary" style="padding:10px 24px;font-size:13.5px;">Simpan Data</button>

@@ -42,6 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['do'] ?? '') === 'upload') 
     if (move_uploaded_file($file['tmp_name'], $uploadDir . $safeName)) {
         $pdo->prepare('UPDATE permintaan SET bast_file = ? WHERE id = ?')->execute([$safeName, $pid]);
         if ($oldFile && is_file($uploadDir . $oldFile)) @unlink($uploadDir . $oldFile);
+        log_activity($pdo, 'bast', 'tambah', 'BAST permintaan #' . $pid);
         flash_set('Berkas BAST berhasil diunggah.');
     } else {
         flash_set('Gagal menyimpan berkas di server.', 'error');

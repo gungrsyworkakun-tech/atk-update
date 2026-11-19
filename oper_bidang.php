@@ -72,6 +72,7 @@ try {
         $ins->execute([$operId, $r['key'], $r['tanggal'], $r['nama'], $r['jumlah'], $r['satuan'], $r['pj'] !== '' ? $r['pj'] : null]);
     }
     $pdo->commit();
+    log_activity($pdo, 'bidang', 'tambah', count($baru) . ' barang dioper ke ' . ($akun['bidang_nama'] ?: $akun['username']), 'keluar', (int)array_sum(array_column($baru, 'jumlah')));
     flash_set(count($baru) . ' barang berhasil dioper ke ' . ($akun['bidang_nama'] ?: $akun['username']) . ' (' . $akun['username'] . ').'
         . ($dilewati ? " $dilewati baris dilewati karena sudah pernah dioper." : ''));
 } catch (Throwable $e) {

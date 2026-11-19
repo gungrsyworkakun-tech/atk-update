@@ -411,7 +411,7 @@ function render_riwayat_cards(array $byBidang, array $operMap = [], array $akun 
             <td style="font-size:12px;color:var(--text-dim);">
               <?= e($t['sumber']) ?>
               <?php if (!empty($operMap[$t['key']])): ?>
-                <div style="color:#0B7A5C;">✓ sudah dioper ke <?= e(implode(', ', array_unique($operMap[$t['key']]))) ?></div>
+                <div style="color:var(--teal-dark);">✓ sudah dioper ke <?= e(implode(', ', array_unique($operMap[$t['key']]))) ?></div>
               <?php endif; ?>
             </td>
           </tr>

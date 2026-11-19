@@ -57,6 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['do'] ?? '') === 'update_st
 
         $pdo->prepare('UPDATE permintaan SET status = ?, catatan_admin = ? WHERE id = ?')->execute([$status, $catatan, $id]);
         $pdo->commit();
+        log_activity($pdo, 'permintaan', 'status', 'Permintaan #' . $id . ' → ' . $status);
         flash_set('Status permintaan diperbarui.');
     } catch (Exception $e) {
         $pdo->rollBack();
@@ -98,6 +99,7 @@ if (($_GET['action'] ?? '') === 'delete' && isset($_GET['id'])) {
 
         $pdo->prepare('DELETE FROM permintaan WHERE id = ?')->execute([$id]);
         $pdo->commit();
+        log_activity($pdo, 'permintaan', 'hapus', 'Permintaan #' . $id . ' dari ' . ($req['bidang'] ?? '-'));
         flash_set('Permintaan dihapus' . ($req['status'] !== 'ditolak' ? ', stok dikembalikan.' : '.'));
     } catch (Exception $e) {
         $pdo->rollBack();
@@ -134,10 +136,10 @@ require __DIR__ . '/includes/header.php';
   .pq-top-right{display:flex;align-items:center;gap:8px;}
 
   .st-badge{font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:20px;white-space:nowrap;}
-  .st-menunggu{background:rgba(245,158,11,.14);color:#B45309;}
+  .st-menunggu{background:rgba(245,158,11,.14);color:var(--ochre-dark);}
   .st-diproses{background:rgba(76,140,255,.15);color:#4c8cff;}
-  .st-selesai{background:rgba(76,175,140,.15);color:#0B7A5C;}
-  .st-ditolak{background:rgba(220,38,38,.10);color:#DC2626;}
+  .st-selesai{background:rgba(76,175,140,.15);color:var(--teal-dark);}
+  .st-ditolak{background:rgba(220,38,38,.10);color:var(--red);}
 
   .pq-form{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin-top:12px;border-top:1px solid var(--line,#232a35);padding-top:12px;}
   .pq-form .field{margin:0;}

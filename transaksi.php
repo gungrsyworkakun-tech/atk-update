@@ -147,6 +147,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['do'] ?? '') === 'save') {
         }
 
         $pdo->commit();
+        log_activity($pdo, 'transaksi', $id ? 'ubah' : 'tambah', $item['nama'] . ' · ' . $jumlah . ' ' . $item['satuan'] . ($bidang ? ' · ' . $bidang : ''), $tipe, (int)$jumlah);
         if ($oldPhysicalFile && is_file($oldPhysicalFile)) @unlink($oldPhysicalFile);
 
         flash_set(($id ? 'Transaksi diperbarui, stok disesuaikan.' : 'Transaksi tersimpan, stok diperbarui.') . ($notifInfo ?? ''));
@@ -171,6 +172,8 @@ if (($_GET['action'] ?? '') === 'delete' && isset($_GET['id'])) {
             require_once __DIR__ . '/includes/riwayat_helper.php';
             oper_hapus_by_key($pdo, 't:' . $trx['id']);
             $pdo->commit();
+            $nmI = $pdo->prepare('SELECT nama FROM items WHERE id = ?'); $nmI->execute([$trx['item_id']]);
+            log_activity($pdo, 'transaksi', 'hapus', ($nmI->fetchColumn() ?: 'Barang') . ' · ' . (int)$trx['jumlah'], $trx['tipe'], (int)$trx['jumlah']);
             if ($trx['bast_file']) {
                 $f = $uploadDir . $trx['bast_file'];
                 if (is_file($f)) @unlink($f);

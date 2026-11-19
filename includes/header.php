@@ -10,6 +10,7 @@ foreach (MODULES as $key => $label) {
     $pageLabels[$file] = $label;
 }
 $pageLabels['kelola_admin.php'] = 'Kelola Admin';
+$pageLabels['aktivitas.php'] = 'Riwayat Aktivitas';
 $pageLabels['kelola_bidang.php'] = 'Kelola Bidang';
 $pageLabels['analitik.php'] = 'Dashboard Analitik';
 $pageLabels['katalog.php'] = 'Katalog Barang';
@@ -44,6 +45,10 @@ function nav_item($file, $label, $iconName, $badge = 0) {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pendataan ATK</title>
+<script>
+// Terapkan tema tersimpan sebelum halaman digambar (mencegah kedipan putih saat tema gelap).
+(function(){try{var t=localStorage.getItem('atk-theme');if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');}}catch(e){}})();
+</script>
 <link rel="icon" type="image/png" href="assets/1.png?v=<?= @filemtime(dirname(__DIR__).'/assets/1.png') ?: time() ?>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -99,6 +104,7 @@ function nav_item($file, $label, $iconName, $badge = 0) {
         <?php if (is_super()): ?>
         <div class="nav-group">
           <div class="nav-group-label">Administrasi</div>
+          <?php nav_item('aktivitas.php', 'Riwayat Aktivitas', 'clock'); ?>
           <?php nav_item('kelola_admin.php', 'Kelola Admin', ADMIN_META['kelola_admin']['icon']); ?>
           <?php nav_item('kelola_bidang.php', 'Kelola Bidang', ADMIN_META['kelola_bidang']['icon']); ?>
         </div>
@@ -115,6 +121,9 @@ function nav_item($file, $label, $iconName, $badge = 0) {
       <button class="icon-btn-ghost" id="sidebar-toggle" type="button" title="Lipat/lebarkan sidebar"><?= icon('sidebar', 18) ?></button>
       <h1 class="page-title"><?= e($breadcrumbLabel ?: 'Pendataan ATK') ?></h1>
       <div class="topbar-right">
+        <button class="icon-btn-ghost theme-btn" id="theme-btn" type="button" title="Ganti tema terang/gelap" aria-label="Ganti tema terang/gelap">
+          <span class="ic-sun"><?= icon('sun', 18) ?></span><span class="ic-moon"><?= icon('moon', 18) ?></span>
+        </button>
       <?php if (!is_bidang()): ?>
         <div class="notif-wrap" id="notif-wrap">
           <button class="icon-btn-ghost notif-bell" id="notif-bell" type="button" title="Notifikasi">

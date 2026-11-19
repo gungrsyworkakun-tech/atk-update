@@ -149,12 +149,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['do'] ?? '') === 'save') {
     if ($id) {
         $stmt = $pdo->prepare('UPDATE penitipan SET nama_penitip=?, kontak=?, nama_barang=?, jumlah=?, satuan=?, tanggal_titip=?, keterangan=?, berkas=? WHERE id=?');
         $stmt->execute([$namaPenitip, $kontak, $namaBarang, $jumlah, $satuan, $tanggalTitip, $keterangan, $berkasFinal, $id]);
+        log_activity($pdo, 'penitipan', 'ubah', $namaBarang . ' · ' . $namaPenitip);
         flash_set('Data penitipan berhasil diperbarui.');
     } else {
         $u = current_user();
         $stmt = $pdo->prepare("INSERT INTO penitipan (nama_penitip, kontak, nama_barang, jumlah, satuan, tanggal_titip, keterangan, berkas, status, dicatat_oleh) VALUES (?,?,?,?,?,?,?,?,'dititip',?)");
         $stmt->execute([$namaPenitip, $kontak, $namaBarang, $jumlah, $satuan, $tanggalTitip, $keterangan, $berkasFinal, $u['id']]);
         $id = $pdo->lastInsertId();
+        log_activity($pdo, 'penitipan', 'tambah', $namaBarang . ' · ' . $namaPenitip);
         flash_set('Barang titipan berhasil dicatat.');
     }
 
@@ -207,6 +209,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['do'] ?? '') === 'ambil') {
         $stmt = $pdo->prepare("UPDATE penitipan SET status='diambil', tanggal_diambil=?, diambil_oleh=? WHERE id=? AND status='dititip'");
         $stmt->execute([$tanggalDiambil, $diambilOleh, $id]);
     }
+    log_activity($pdo, 'penitipan', 'status', 'Titipan #' . $id . ' diambil oleh ' . $diambilOleh);
     flash_set('Barang titipan ditandai sudah diambil.');
     redirect('penitipan.php');
 }
@@ -222,6 +225,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['do'] ?? '') === 'batal_amb
     $stmt = $pdo->prepare("UPDATE penitipan SET status='dititip', tanggal_diambil=NULL, diambil_oleh=NULL, foto_pengambilan=NULL WHERE id=?");
     $stmt->execute([$id]);
     if ($fotoAmbilLama && is_file($uploadDir . $fotoAmbilLama)) @unlink($uploadDir . $fotoAmbilLama);
+    log_activity($pdo, 'penitipan', 'status', 'Titipan #' . $id . ' dikembalikan ke masih dititip');
     flash_set('Status dikembalikan ke "Masih Dititip".');
     redirect('penitipan.php');
 }
@@ -237,6 +241,7 @@ if (($_GET['action'] ?? '') === 'delete' && isset($_GET['id'])) {
     $stmtFotoLama->execute([$delId]);
     $fotoLamaList = $stmtFotoLama->fetchAll();
 
+    log_activity($pdo, 'penitipan', 'hapus', 'Titipan #' . $delId);
     $pdo->prepare('DELETE FROM penitipan WHERE id = ?')->execute([$delId]); // penitipan_foto ikut terhapus via ON DELETE CASCADE
 
     if ($dataHapus && !empty($dataHapus['berkas']) && is_file($uploadDir . $dataHapus['berkas'])) {
@@ -555,7 +560,7 @@ require __DIR__ . '/includes/header.php';
                 <button type="submit" class="btn btn-ghost">Batalkan</button>
               </form>
             <?php endif; ?>
-            <a class="btn btn-ghost" style="color:#DC2626;" href="penitipan.php?action=delete&id=<?= (int)$r['id'] ?>" onclick="return confirm('Hapus catatan titipan ini?');">Hapus</a>
+            <a class="btn btn-ghost" style="color:var(--red);" href="penitipan.php?action=delete&id=<?= (int)$r['id'] ?>" onclick="return confirm('Hapus catatan titipan ini?');">Hapus</a>
           </div>
         </td>
       </tr>

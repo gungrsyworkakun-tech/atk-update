@@ -50,7 +50,7 @@ require __DIR__ . '/includes/header.php';
       <div>
         <h3 style="margin:0;">
           Kiriman dari <?= e($o['dibuat_oleh_nama'] ?: 'admin') ?>
-          <?php if ($baru): ?><span style="background:#DC2626;color:#fff;border-radius:20px;font-size:10.5px;font-weight:700;padding:2px 8px;margin-left:6px;">Baru</span><?php endif; ?>
+          <?php if ($baru): ?><span style="background:var(--red);color:#fff;border-radius:20px;font-size:10.5px;font-weight:700;padding:2px 8px;margin-left:6px;">Baru</span><?php endif; ?>
         </h3>
         <div style="font-size:12px;color:var(--text-dim);margin-top:2px;"><?= e(tgl_indo(substr((string)$o['created_at'], 0, 10))) ?> · <?= count($o['items']) ?> barang</div>
         <?php if (!empty($o['catatan'])): ?><div style="font-size:12.5px;margin-top:6px;">Catatan: <?= e($o['catatan']) ?></div><?php endif; ?>

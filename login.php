@@ -391,7 +391,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
-            background: #0f1218 url("assets/kantor.jpg") 24% center / cover no-repeat;
+            background: #0f1218 url("assets/kantor.jpg?v=2") 24% center / cover no-repeat;
             border-right: 1px solid var(--line);
         }
         /* Lapisan gelap supaya teks tetap jelas dibaca di atas foto */

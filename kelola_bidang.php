@@ -10,6 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['do'] ?? '') === 'save') {
     } else {
         try {
             $pdo->prepare('INSERT INTO bidang_list (nama) VALUES (?)')->execute([$nama]);
+            log_activity($pdo, 'bidang', 'tambah', $nama);
             flash_set('Bidang ditambahkan.');
         } catch (PDOException $e) {
             flash_set('Nama bidang sudah ada di daftar.', 'error');
@@ -20,6 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['do'] ?? '') === 'save') {
 
 if (($_GET['action'] ?? '') === 'delete' && isset($_GET['id'])) {
     $pdo->prepare('DELETE FROM bidang_list WHERE id = ?')->execute([$_GET['id']]);
+    log_activity($pdo, 'bidang', 'hapus', 'Bidang #' . (int)$_GET['id']);
     flash_set('Bidang dihapus dari daftar.');
     redirect('kelola_bidang.php');
 }

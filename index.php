@@ -61,6 +61,22 @@ $recentStmt = $pdo->prepare("SELECT t.*, i.nama FROM transactions t LEFT JOIN it
 $recentStmt->execute($filterParams);
 $recent = $recentStmt->fetchAll();
 
+// Catatan aktivitas semua akun (ubah data, barang masuk/keluar, dll) pada periode yang sama.
+activity_ensure_table($pdo);
+$actCond = []; $actParams = [];
+if ($useRange) {
+    if ($filterDari !== '') { $actCond[] = 'a.created_at >= ?'; $actParams[] = $filterDari . ' 00:00:00'; }
+    if ($filterSampai !== '') { $actCond[] = 'a.created_at <= ?'; $actParams[] = $filterSampai . ' 23:59:59'; }
+} elseif ($filterTahun !== 'semua') {
+    $actCond[] = 'a.created_at >= ? AND a.created_at < ?';
+    $actParams[] = $filterTahun . '-01-01 00:00:00';
+    $actParams[] = ((int)$filterTahun + 1) . '-01-01 00:00:00';
+}
+$actWhere = $actCond ? ('WHERE ' . implode(' AND ', $actCond)) : '';
+$actStmt = $pdo->prepare("SELECT a.* FROM activity_log a $actWhere ORDER BY a.id DESC LIMIT 8");
+$actStmt->execute($actParams);
+$activities = $actStmt->fetchAll();
+
 // Susun daftar shortcut berdasarkan hak akses user yang login.
 $shortcuts = [];
 // Menambahkan kelola_permintaan (dari kode lama)
@@ -168,11 +184,25 @@ require __DIR__ . '/includes/header.php';
   <div class="dash-side">
     <div class="section-label"><span class="dot dot-purple"></span>Aktivitas <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-dim);">· <?= e($periodeLabel) ?></span></div>
     <div class="card activity-card">
-      <?php if (!$recent): ?>
+      <?php if ($activities): ?>
+        <ul class="activity-list">
+          <?php foreach ($activities as $a): [$mod, $kata, $warna] = activity_label($a); ?>
+            <li>
+              <span class="badge badge-<?= $warna ?> sm"><?= icon($a['tipe'] ? 'arrows' : 'clock', 15) ?></span>
+              <span class="al-text">
+                <span class="al-title"><b><?= e($a['username'] ?? 'Sistem') ?></b> <?= e($kata) ?> <?= e(strtolower($mod)) ?><?= $a['tipe'] ? ' (barang ' . e($a['tipe']) . ')' : '' ?></span>
+                <span class="al-sub"><?= e($a['detail'] ?? '') ?></span>
+                <span class="al-sub"><?= e(date('d M Y H:i', strtotime($a['created_at']))) ?></span>
+              </span>
+            </li>
+          <?php endforeach; ?>
+        </ul>
+        <?php if (is_super()): ?><a class="al-more" href="aktivitas.php">Lihat semua aktivitas →</a><?php endif; ?>
+      <?php elseif (!$recent): ?>
         <div class="empty-panel">
           <span class="empty-ic"><?= icon('clock', 26) ?></span>
-          <b><?= $isFiltered ? 'Tidak ada transaksi' : 'Belum ada aktivitas' ?></b>
-          <p><?= $isFiltered ? 'Tidak ada barang masuk atau keluar pada periode yang dipilih.' : 'Saat ada barang masuk atau keluar, riwayatnya akan tampil di sini.' ?></p>
+          <b>Belum ada aktivitas</b>
+          <p>Setiap perubahan data oleh akun admin dan barang masuk/keluar akan tercatat di sini.</p>
         </div>
       <?php else: ?>
         <ul class="activity-list">

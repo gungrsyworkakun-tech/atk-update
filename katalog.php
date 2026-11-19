@@ -88,7 +88,7 @@ require __DIR__ . '/includes/header.php';
     <div class="cat-card">
       <div class="cat-photo">
         <?php if (!empty($it['foto'])): ?>
-          <img src="serve_foto_barang.php?id=<?= (int)$it['id'] ?>" alt="Foto <?= e($it['nama']) ?>">
+          <img loading="lazy" decoding="async" src="serve_foto_barang.php?id=<?= (int)$it['id'] ?>&thumb=1&v=<?= urlencode((string)($it['foto'] ?? '')) ?>" alt="Foto <?= e($it['nama']) ?>">
         <?php else: ?>
           <div class="cat-photo-placeholder"><?= icon('box', 26) ?><br>Tanpa foto</div>
         <?php endif; ?>

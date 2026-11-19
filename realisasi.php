@@ -7,6 +7,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['do'] ?? '') === 'set_limit
     $id = (int)$_POST['id'];
     $min = max(0, (int)$_POST['stok_minimum']);
     $pdo->prepare('UPDATE items SET stok_minimum = ? WHERE id = ?')->execute([$min, $id]);
+    $nmQ = $pdo->prepare('SELECT nama FROM items WHERE id = ?'); $nmQ->execute([$id]);
+    log_activity($pdo, 'stok_minimum', 'ubah', ($nmQ->fetchColumn() ?: 'Barang #' . $id) . ' · batas ' . $min);
     flash_set('Limit stok diperbarui.');
     redirect('realisasi.php');
 }

@@ -105,6 +105,31 @@ File cadangan (sebelum diubah) ada di komputermu dengan akhiran `.bak`: `barcode
 - Semua file PHP lolos pemeriksaan sintaks.
 - **Belum diuji di komputermu:** halaman lain (Transaksi, Permintaan, BAST, Penitipan, dan lainnya) memakai gaya sendiri-sendiri. Kalau ada yang warnanya janggal, kirim screenshot-nya.
 
+## Tahap 3: catatan aktivitas, gambar cepat, tema gelap/terang
+
+### 1. Catatan aktivitas semua akun
+- Setiap perubahan data kini tercatat: siapa (akun), melakukan apa, kapan. Tabel `activity_log` dibuat otomatis saat pertama dipakai.
+- Yang dicatat: **barang masuk/keluar** (tambah, ubah, hapus), data barang, harga, stok minimum, permintaan bidang, penitipan, BAST, akun admin, bidang, notifikasi, oper ke bidang.
+- Panel **Aktivitas** di dashboard menampilkan 8 catatan terbaru sesuai periode yang dipilih, lengkap dengan nama akun dan jam.
+- Halaman baru **Riwayat Aktivitas** (menu Administrasi, hanya super admin) dengan filter akun/jenis dan halaman-halaman.
+- Catatan lama sebelum tahap ini tidak ada; selama belum ada catatan baru, panel dashboard masih menampilkan transaksi terakhir seperti sebelumnya.
+
+### 2. Gambar lebih cepat
+- Foto barang di Katalog, Data Barang, dan Harga memakai thumbnail kecil, dimuat bertahap (lazy), dan disimpan di cache browser.
+- Gambar latar login dikecilkan dari 10 MB menjadi sekitar 370 KB (aslinya dicadangkan).
+- `.htaccess`: cache gambar 30 hari dan kompresi teks.
+
+### 3. Tema terang & gelap
+- Tombol matahari/bulan di bar atas. Pilihan disimpan di browser, bawaan terang, dan diterapkan sebelum halaman tampil (tanpa kedipan).
+- Warna dipindah ke variabel sehingga dua tema konsisten. Cetak (barcode, BAST) selalu terang.
+
+### File tahap 3
+Baru: `aktivitas.php`, `includes/activity_log.php`. Diubah: `index.php`, `includes/bootstrap.php`, `header.php`, `footer.php`, `functions.php`, `assets/style.css`, `assets/kantor.jpg`, `.htaccess`, `login.php`, `transaksi.php`, `data_barang.php`, `harga.php`, `realisasi.php`, `kelola_permintaan.php`, `permintaan.php`, `penitipan.php`, `kelola_admin.php`, `kelola_bidang.php`, `kirim_notifikasi.php`, `oper_bidang.php`, `bast.php`, `input_bast.php`, `katalog.php`, dan beberapa halaman dengan penyesuaian warna.
+
+### Pengujian tahap 3
+- Pencatatan diuji dengan database uji (beberapa akun, masuk/keluar/hapus). Screenshot dashboard, tabel, dan Riwayat Aktivitas di kedua tema, komputer dan HP. Semua PHP lolos sintaks.
+- Belum diuji di MySQL aslimu: coba catat satu barang masuk lalu lihat dashboard.
+
 ## Yang masih perlu kamu lakukan
 
 1. **Tambahkan GD ke `Dockerfile`** supaya tidak hilang saat container dibuat ulang:

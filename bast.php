@@ -29,6 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['do'] ?? '') === 'upload') 
     $safeName = 'bast-' . $trxId . '-' . time() . '.' . preg_replace('/[^a-zA-Z0-9]/', '', $ext);
     if (move_uploaded_file($file['tmp_name'], $uploadDir . $safeName)) {
         $pdo->prepare('UPDATE transactions SET bast_file = ? WHERE id = ?')->execute([$safeName, $trxId]);
+        log_activity($pdo, 'bast', 'tambah', 'BAST transaksi #' . $trxId);
         flash_set('Berkas BAST diunggah.');
     } else {
         flash_set('Gagal menyimpan berkas di server.', 'error');
@@ -44,6 +45,7 @@ if (($_GET['action'] ?? '') === 'delete' && isset($_GET['id'])) {
         $f = $uploadDir . $row['bast_file'];
         if (is_file($f)) @unlink($f);
         $pdo->prepare('UPDATE transactions SET bast_file = NULL WHERE id = ?')->execute([$_GET['id']]);
+        log_activity($pdo, 'bast', 'hapus', 'BAST transaksi #' . (int)$_GET['id']);
         flash_set('Berkas BAST dihapus.');
     } else {
         flash_set('Berkas tidak ditemukan.', 'error');
@@ -72,8 +74,8 @@ require __DIR__ . '/includes/header.php';
   .bast-card{border:1px solid var(--line,#232a35);border-radius:12px;padding:14px;background:var(--panel,#12161c);display:flex;flex-direction:column;gap:10px;}
   .bast-card-top{display:flex;gap:10px;align-items:flex-start;}
   .bast-file-ic{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
-  .bast-file-ic.pdf{background:rgba(220,38,38,.10);color:#DC2626;}
-  .bast-file-ic.img{background:rgba(76,175,140,.15);color:#0B7A5C;}
+  .bast-file-ic.pdf{background:rgba(220,38,38,.10);color:var(--red);}
+  .bast-file-ic.img{background:rgba(76,175,140,.15);color:var(--teal-dark);}
   .bast-file-ic.empty{background:rgba(140,150,165,.12);color:var(--text-dim,#8b95a5);}
   .bast-meta{min-width:0;}
   .bast-item-name{font-weight:600;font-size:14px;line-height:1.3;}

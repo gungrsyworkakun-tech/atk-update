@@ -7,6 +7,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['do'] ?? '') === 'set_harga
     $id = (int)$_POST['id'];
     $harga = max(0, (float)$_POST['harga']);
     $pdo->prepare('UPDATE items SET harga = ? WHERE id = ?')->execute([$harga, $id]);
+    $nmQ = $pdo->prepare('SELECT nama FROM items WHERE id = ?'); $nmQ->execute([$id]);
+    log_activity($pdo, 'harga', 'ubah', ($nmQ->fetchColumn() ?: 'Barang #' . $id) . ' · Rp ' . number_format($harga, 0, ',', '.'));
     flash_set('Harga diperbarui.');
     redirect('harga.php');
 }
@@ -142,7 +144,7 @@ require __DIR__ . '/includes/header.php';
     <div class="hg-card js-open-detail" data-item='<?= $itemJson ?>'>
       <div class="hg-photo">
         <?php if (!empty($it['foto'])): ?>
-          <img src="serve_foto_barang.php?id=<?= (int)$it['id'] ?>" alt="Foto <?= e($it['nama']) ?>">
+          <img loading="lazy" decoding="async" src="serve_foto_barang.php?id=<?= (int)$it['id'] ?>&thumb=1&v=<?= urlencode((string)($it['foto'] ?? '')) ?>" alt="Foto <?= e($it['nama']) ?>">
         <?php else: ?>
           <div class="hg-photo-placeholder"><?= icon('box', 30) ?></div>
         <?php endif; ?>

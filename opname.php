@@ -98,7 +98,7 @@ require __DIR__ . '/includes/header.php';
     <button class="btn btn-primary" type="submit" style="padding:9px 18px;">Terapkan</button>
     <button class="btn btn-ghost" type="button" onclick="window.print()" style="padding:9px 18px;">Cetak / Simpan PDF</button>
     <button class="btn btn-ghost" type="button" id="opCsv" style="padding:9px 18px;">Unduh Excel (CSV)</button>
-    <button class="btn btn-ghost" type="button" id="opReset" style="padding:9px 18px;color:#DC2626;">Kosongkan isian</button>
+    <button class="btn btn-ghost" type="button" id="opReset" style="padding:9px 18px;color:var(--red);">Kosongkan isian</button>
   </div>
 </form>
 
