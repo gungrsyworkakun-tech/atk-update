@@ -17,6 +17,7 @@ $pageLabels['katalog.php'] = 'Katalog Barang';
 $pageLabels['permintaan.php'] = 'Permintaan ATK';
 $pageLabels['progres.php'] = 'Progres ATK';
 $pageLabels['input_bast.php'] = 'Input BAST';
+$pageLabels['kalender.php'] = 'Kalender Pengambilan';
 $pageLabels['riwayat_ambil.php'] = 'Riwayat Pengambilan';
 $breadcrumbLabel = $pageLabels[$currentPage] ?? null;
 
@@ -25,6 +26,14 @@ require_once __DIR__ . '/riwayat_helper.php';
 $pendingReq = 0;
 if (!is_bidang() && has_permission('kelola_permintaan')) {
     try { $pendingReq = (int)($GLOBALS['pdo']->query("SELECT COUNT(*) FROM permintaan WHERE status = 'menunggu'")->fetchColumn()); } catch (Throwable $e) { $pendingReq = 0; }
+}
+$bastBelum = 0;
+if (is_bidang()) {
+    try {
+        $qb = $GLOBALS['pdo']->prepare("SELECT COUNT(*) FROM permintaan WHERE user_id = ? AND status IN ('diproses','selesai') AND (bast_file IS NULL OR bast_file = '')");
+        $qb->execute([(int)($u['id'] ?? 0)]);
+        $bastBelum = (int)$qb->fetchColumn();
+    } catch (Throwable $e) { $bastBelum = 0; }
 }
 $operBaru = is_bidang() ? oper_belum_dibaca($GLOBALS['pdo'] ?? null, (int)($u['id'] ?? 0)) : 0;
 
@@ -78,6 +87,7 @@ function nav_item($file, $label, $iconName, $badge = 0) {
           <?php nav_item('katalog.php', 'Katalog Barang', 'box'); ?>
           <?php nav_item('permintaan.php', 'Permintaan ATK', 'clipboard'); ?>
           <?php nav_item('progres.php', 'Progres ATK', 'gauge'); ?>
+          <?php nav_item('kalender.php', 'Kalender Pengambilan', 'calendar'); ?>
           <?php nav_item('riwayat_ambil.php', 'Riwayat Pengambilan', 'clock', $operBaru); ?>
           <?php nav_item('input_bast.php', 'Input BAST', 'file'); ?>
         </div>
@@ -86,6 +96,7 @@ function nav_item($file, $label, $iconName, $badge = 0) {
           <div class="nav-group-label">Menu Utama</div>
           <?php nav_item('index.php', 'Dashboard', 'grid'); ?>
           <?php nav_item('analitik.php', 'Dashboard Analitik', 'gauge'); ?>
+          <?php if (has_permission('kelola_permintaan')) nav_item('kalender.php', 'Kalender Pengambilan', 'calendar'); ?>
         </div>
 
         <?php if (has_permission('barang_masuk_keluar') || has_permission('barcode') || has_permission('data_barang') || has_permission('bast') || has_permission('realisasi') || has_permission('harga') || has_permission('bidang') || has_permission('kelola_permintaan') || has_permission('penitipan') || has_permission('kirim_notifikasi') || has_permission('opname')): ?>
@@ -287,6 +298,27 @@ function nav_item($file, $label, $iconName, $badge = 0) {
     </script>
 
 
+    <?php if (is_bidang() && $bastBelum > 0): ?>
+    <div id="live-toasts" aria-live="polite"></div>
+    <script>
+    // Pengingat berkala: BAST belum diunggah (muncul saat halaman dibuka lalu tiap 10 menit).
+    (function(){
+      var KEY = 'atk-bast-remind', JEDA = 10 * 60 * 1000, n = <?= (int)$bastBelum ?>;
+      if (<?= json_encode($currentPage === 'input_bast.php') ?>) return;
+      function tampil(){
+        var box = document.getElementById('live-toasts'); if (!box) return;
+        try { localStorage.setItem(KEY, String(Date.now())); } catch (e) {}
+        var el = document.createElement('a'); el.className = 'live-toast warn'; el.href = 'input_bast';
+        el.innerHTML = '<span class="lt-ic">&#128196;</span><span class="lt-body"><b>BAST belum diunggah</b><span>' + n + ' permintaan masih menunggu berkas BAST. Ketuk untuk upload sekarang.</span></span><button type="button" aria-label="Tutup">&times;</button>';
+        el.querySelector('button').addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); el.remove(); });
+        box.appendChild(el); setTimeout(function(){ el.classList.add('out'); setTimeout(function(){ el.remove(); }, 350); }, 12000);
+      }
+      function perluTampil(){ var t = 0; try { t = parseInt(localStorage.getItem(KEY) || '0', 10); } catch (e) {} return Date.now() - t >= JEDA; }
+      setTimeout(function(){ if (perluTampil()) tampil(); }, 2500);
+      setInterval(function(){ if (!document.hidden && perluTampil()) tampil(); }, 60000);
+    })();
+    </script>
+    <?php endif; ?>
     <?php if (!is_bidang() && has_permission('kelola_permintaan')): ?>
     <div id="live-toasts" aria-live="polite"></div>
     <script>
@@ -348,6 +380,12 @@ function nav_item($file, $label, $iconName, $badge = 0) {
     <div class="main">
       <?php $flash = flash_get(); if ($flash): ?>
         <div class="flash <?= e($flash['type']) ?>"><?= e($flash['msg']) ?></div>
+      <?php endif; ?>
+      <?php if (is_bidang() && $bastBelum > 0 && $currentPage !== 'input_bast.php'): ?>
+        <div class="flash error bast-remind">
+          <b><?= (int)$bastBelum ?></b> permintaan belum diunggah BAST-nya.
+          <a href="<?= clean_url('input_bast.php') ?>" style="font-weight:700;text-decoration:underline;margin-left:6px;">Upload BAST sekarang</a>
+        </div>
       <?php endif; ?>
       <?php if (is_bidang() && $operBaru > 0 && $currentPage !== 'riwayat_ambil.php'): ?>
         <div class="flash ok">
