@@ -65,6 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['do'] ?? '') === 'create_bi
 }
 
 if (($_GET['action'] ?? '') === 'delete' && isset($_GET['id'])) {
+    csrf_check_get();
     $pdo->prepare('DELETE FROM users WHERE id = ? AND role = "admin"')->execute([$_GET['id']]);
     log_activity($pdo, 'akun', 'hapus', 'Admin #' . (int)$_GET['id']);
     flash_set('Admin dihapus.');
@@ -72,6 +73,7 @@ if (($_GET['action'] ?? '') === 'delete' && isset($_GET['id'])) {
 }
 
 if (($_GET['action'] ?? '') === 'delete_bidang' && isset($_GET['id'])) {
+    csrf_check_get();
     $pdo->prepare('DELETE FROM users WHERE id = ? AND role = "bidang"')->execute([$_GET['id']]);
     log_activity($pdo, 'akun', 'hapus', 'Admin bidang #' . (int)$_GET['id']);
     flash_set('Akun Admin Bidang dihapus.');
@@ -153,7 +155,7 @@ require __DIR__ . '/includes/header.php';
         </td>
         <td class="actions-cell">
           <a class="icon-btn" href="?action=edit&id=<?= e($adm['id']) ?>">Ubah akses</a>
-          <a class="icon-btn danger" href="?action=delete&id=<?= e($adm['id']) ?>" onclick="return confirm('Hapus akun admin ini?');">Hapus</a>
+          <a class="icon-btn danger" href="?action=delete&id=<?= e($adm['id']) ?>&csrf=<?= e(csrf_token()) ?>" onclick="return confirm('Hapus akun admin ini?');">Hapus</a>
         </td>
       </tr>
       <?php endforeach; ?>
@@ -202,7 +204,7 @@ require __DIR__ . '/includes/header.php';
         <td><?= e($bu['username']) ?></td>
         <td><?= e($bu['bidang_nama']) ?></td>
         <td class="actions-cell">
-          <a class="icon-btn danger" href="?action=delete_bidang&id=<?= e($bu['id']) ?>" onclick="return confirm('Hapus akun Admin Bidang ini?');">Hapus</a>
+          <a class="icon-btn danger" href="?action=delete_bidang&id=<?= e($bu['id']) ?>&csrf=<?= e(csrf_token()) ?>" onclick="return confirm('Hapus akun Admin Bidang ini?');">Hapus</a>
         </td>
       </tr>
       <?php endforeach; ?>

@@ -20,6 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['do'] ?? '') === 'save') {
 }
 
 if (($_GET['action'] ?? '') === 'delete' && isset($_GET['id'])) {
+    csrf_check_get();
     $pdo->prepare('DELETE FROM bidang_list WHERE id = ?')->execute([$_GET['id']]);
     log_activity($pdo, 'bidang', 'hapus', 'Bidang #' . (int)$_GET['id']);
     flash_set('Bidang dihapus dari daftar.');
@@ -58,7 +59,7 @@ require __DIR__ . '/includes/header.php';
       <tr>
         <td><?= e($b['nama']) ?></td>
         <td class="actions-cell">
-          <a class="icon-btn danger" href="?action=delete&id=<?= e($b['id']) ?>" onclick="return confirm('Hapus bidang ini dari daftar pilihan? Transaksi lama tetap menyimpan nama bidang sebelumnya.');">Hapus</a>
+          <a class="icon-btn danger" href="?action=delete&id=<?= e($b['id']) ?>&csrf=<?= e(csrf_token()) ?>" onclick="return confirm('Hapus bidang ini dari daftar pilihan? Transaksi lama tetap menyimpan nama bidang sebelumnya.');">Hapus</a>
         </td>
       </tr>
       <?php endforeach; ?>

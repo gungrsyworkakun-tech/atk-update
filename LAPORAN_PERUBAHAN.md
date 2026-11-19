@@ -159,3 +159,8 @@ Baru: `aktivitas.php`, `includes/activity_log.php`. Diubah: `index.php`, `includ
 - Tabel diganti kartu per titipan: penitip + kontak, status, daftar barang dalam 2 kolom (maks 6, sisanya "Lihat barang lainnya"), keterangan, foto/berkas, info pengambilan.
 - Ringkasan jadi 3 kartu statistik; tombol aksi rapi (Tandai Diambil / Ubah / Hapus).
 - Form Catat/Ubah titipan dibuat 3 langkah (Data penitip, Barang, Dokumentasi) dengan header berwarna dan area unggah foto.
+
+## Perbaikan keamanan (branch uji-coba)
+- Semua tombol Hapus yang berupa link kini membawa token CSRF dan dicek di server (`csrf_check_get`), jadi tidak bisa dipicu dari situs lain.
+- Semua upload file kini dicek dari ISI file (`sanitize_uploads` di bootstrap): hanya JPG/PNG/WebP/PDF asli; file menyamar (mis. .php) ditolak.
+- Header `X-Content-Type-Options: nosniff` ditambah di penayang file Penitipan dan BAST.

@@ -159,6 +159,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['do'] ?? '') === 'save') {
 }
 
 if (($_GET['action'] ?? '') === 'delete' && isset($_GET['id'])) {
+    csrf_check_get();
     $stmt = $pdo->prepare('SELECT * FROM transactions WHERE id = ?');
     $stmt->execute([$_GET['id']]);
     $trx = $stmt->fetch();
@@ -396,7 +397,7 @@ require __DIR__ . '/includes/header.php';
         </td>
         <td class="actions-cell">
           <a class="icon-btn" href="?action=edit&id=<?= e($t['id']) ?>">Ubah</a>
-          <a class="icon-btn danger" href="?action=delete&id=<?= e($t['id']) ?>" onclick="return confirm('Hapus transaksi ini?');">Hapus</a>
+          <a class="icon-btn danger" href="?action=delete&id=<?= e($t['id']) ?>&csrf=<?= e(csrf_token()) ?>" onclick="return confirm('Hapus transaksi ini?');">Hapus</a>
         </td>
       </tr>
       <?php endforeach; ?>

@@ -38,6 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['do'] ?? '') === 'upload') 
 }
 
 if (($_GET['action'] ?? '') === 'delete' && isset($_GET['id'])) {
+    csrf_check_get();
     $stmt = $pdo->prepare('SELECT bast_file FROM transactions WHERE id = ?');
     $stmt->execute([$_GET['id']]);
     $row = $stmt->fetch();
@@ -129,7 +130,7 @@ require __DIR__ . '/includes/header.php';
             data-filename="<?= e($t['bast_file']) ?>"
             data-image="<?= $isPdf ? '0' : '1' ?>">Lihat</button>
           <a class="btn btn-primary" href="serve_bast.php?id=<?= e($t['id']) ?>&download=1">Unduh</a>
-          <a class="icon-btn danger" href="?action=delete&id=<?= e($t['id']) ?>" title="Hapus berkas" onclick="return confirm('Hapus berkas BAST ini? Data transaksi tidak ikut terhapus.');">Hapus</a>
+          <a class="icon-btn danger" href="?action=delete&id=<?= e($t['id']) ?>&csrf=<?= e(csrf_token()) ?>" title="Hapus berkas" onclick="return confirm('Hapus berkas BAST ini? Data transaksi tidak ikut terhapus.');">Hapus</a>
         </div>
       <?php else: ?>
         <span class="bast-empty-tag">Belum ada berkas</span>

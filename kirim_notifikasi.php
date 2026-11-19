@@ -25,6 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['do'] ?? '') === 'kirim') {
 // Sengaja dibatasi tipe='pengumuman' saja, supaya halaman ini tidak bisa
 // menghapus notifikasi stok dari cron notifikasi_stok.php.
 if (($_GET['action'] ?? '') === 'delete' && isset($_GET['id'])) {
+    csrf_check_get();
     $pdo->prepare("DELETE FROM notifikasi WHERE id = ? AND tipe = 'pengumuman'")->execute([$_GET['id']]);
     log_activity($pdo, 'notifikasi', 'hapus', 'Notifikasi #' . (int)$_GET['id']);
     flash_set('Notifikasi dibatalkan.');
@@ -128,7 +129,7 @@ require __DIR__ . '/includes/header.php';
             <span class="kn-badge <?= $r['jumlah_dibaca'] > 0 ? 'read' : 'unread' ?>"><?= (int)$r['jumlah_dibaca'] ?>/<?= $totalAdmin ?> admin baca</span>
           </div>
           <a class="btn btn-ghost" style="color:var(--red);font-size:11.5px;padding:6px 10px;margin-top:10px;display:inline-block;"
-             href="kirim_notifikasi.php?action=delete&id=<?= (int)$r['id'] ?>"
+             href="kirim_notifikasi.php?action=delete&id=<?= (int)$r['id'] ?>&csrf=<?= e(csrf_token()) ?>"
              onclick="return confirm('Batalkan pengumuman ini? Ini akan langsung hilang dari bel notifikasi semua admin.');">Batalkan</a>
         </div>
       <?php endforeach; ?>

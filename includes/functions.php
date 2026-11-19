@@ -79,6 +79,50 @@ function csrf_check() {
     }
 }
 
+/** Perlindungan CSRF untuk aksi lewat link (GET), mis. Hapus. Token dikirim di URL (&csrf=...). */
+function csrf_check_get() {
+    $token = $_GET['csrf'] ?? '';
+    if (!is_string($token) || !hash_equals($_SESSION['csrf'] ?? '', $token)) {
+        http_response_code(400);
+        die('Tautan tidak valid atau sudah kedaluwarsa. Muat ulang halaman lalu coba lagi.');
+    }
+}
+
+/** Deteksi jenis file upload dari ISI file (bukan dari nama/tipe kiriman browser). */
+function upload_detect_mime($tmp) {
+    if (!is_string($tmp) || $tmp === '' || !is_file($tmp)) return '';
+    if (function_exists('finfo_open')) {
+        $fi = @finfo_open(FILEINFO_MIME_TYPE);
+        if ($fi) { $m = @finfo_file($fi, $tmp); finfo_close($fi); if (is_string($m)) return $m; }
+    }
+    $h = @file_get_contents($tmp, false, null, 0, 8);
+    if ($h !== false && strncmp($h, '%PDF-', 5) === 0) return 'application/pdf';
+    $info = @getimagesize($tmp);
+    return ($info && !empty($info['mime'])) ? $info['mime'] : '';
+}
+
+/** Amankan semua $_FILES: 'type' diganti hasil deteksi isi file, ekstensi nama disamakan dengan jenis asli.
+ *  Jadi file .php yang menyamar jadi gambar otomatis ditolak oleh pengecekan format di tiap halaman. */
+function sanitize_uploads() {
+    static $extMap = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp', 'application/pdf' => 'pdf'];
+    $fix = function ($tmp, &$type, &$name) use ($extMap) {
+        $mime = upload_detect_mime($tmp);
+        if (isset($extMap[$mime])) { $type = $mime; $name = 'file.' . $extMap[$mime]; }
+        else { $type = 'application/octet-stream'; $name = 'file.bin'; }
+    };
+    foreach ($_FILES as $k => &$f) {
+        if (is_array($f['name'])) {
+            foreach ($f['name'] as $i => $_) {
+                if (($f['error'][$i] ?? 4) !== UPLOAD_ERR_OK) continue;
+                $fix($f['tmp_name'][$i], $f['type'][$i], $f['name'][$i]);
+            }
+        } elseif (($f['error'] ?? 4) === UPLOAD_ERR_OK) {
+            $fix($f['tmp_name'], $f['type'], $f['name']);
+        }
+    }
+    unset($f);
+}
+
 function permintaan_status_label($status) {
     $map = ['menunggu' => 'Menunggu', 'diproses' => 'Diproses', 'selesai' => 'Selesai', 'ditolak' => 'Ditolak'];
     return $map[$status] ?? $status;

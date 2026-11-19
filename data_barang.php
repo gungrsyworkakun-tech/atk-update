@@ -136,6 +136,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['do'] ?? '') === 'save') {
 }
 
 if (($_GET['action'] ?? '') === 'delete_satuan' && isset($_GET['id']) && isset($_GET['item_id'])) {
+    csrf_check_get();
     $pdo->prepare('DELETE FROM item_satuan WHERE id = ? AND item_id = ?')->execute([$_GET['id'], $_GET['item_id']]);
     log_activity($pdo, 'barang', 'ubah', 'Hapus satuan turunan barang #' . (int)$_GET['item_id']);
     flash_set('Satuan turunan dihapus.');
@@ -143,6 +144,7 @@ if (($_GET['action'] ?? '') === 'delete_satuan' && isset($_GET['id']) && isset($
 }
 
 if (($_GET['action'] ?? '') === 'delete' && isset($_GET['id'])) {
+    csrf_check_get();
     $nmQ = $pdo->prepare('SELECT nama, kode FROM items WHERE id = ?'); $nmQ->execute([$_GET['id']]); $nmR = $nmQ->fetch();
     $pdo->prepare('DELETE FROM items WHERE id = ?')->execute([$_GET['id']]);
     log_activity($pdo, 'barang', 'hapus', $nmR ? ($nmR['nama'] . ' (' . $nmR['kode'] . ')') : ('Barang #' . (int)$_GET['id']));
@@ -849,7 +851,7 @@ require __DIR__ . '/includes/header.php';
     unitIsiTmp.value = '';
     renderUnitList();
 
-    hapusBtn.href = 'data_barang.php?action=delete&id=' + item.id;
+    hapusBtn.href = 'data_barang.php?action=delete&id=' + item.id + '&csrf=<?= e(csrf_token()) ?>';
     hapusBtn.style.display = 'inline-block';
 
     overlay.classList.add('show');

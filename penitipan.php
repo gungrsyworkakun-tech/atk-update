@@ -240,6 +240,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['do'] ?? '') === 'batal_amb
 
 // ---------- Hapus ----------
 if (($_GET['action'] ?? '') === 'delete' && isset($_GET['id'])) {
+    csrf_check_get();
     $delId = (int)$_GET['id'];
     $cek = $pdo->prepare('SELECT berkas, foto_pengambilan FROM penitipan WHERE id = ?');
     $cek->execute([$delId]);
@@ -564,7 +565,7 @@ require __DIR__ . '/includes/header.php';
         </form>
       <?php endif; ?>
       <button type="button" class="btn btn-ghost js-edit" data-item='<?= $itemJson ?>'>Ubah</button>
-      <a class="btn btn-ghost pn-del" href="penitipan.php?action=delete&id=<?= (int)$r['id'] ?>" onclick="return confirm('Hapus catatan titipan ini?');">Hapus</a>
+      <a class="btn btn-ghost pn-del" href="penitipan.php?action=delete&id=<?= (int)$r['id'] ?>&csrf=<?= e(csrf_token()) ?>" onclick="return confirm('Hapus catatan titipan ini?');">Hapus</a>
     </footer>
   </article>
   <?php endforeach; ?>

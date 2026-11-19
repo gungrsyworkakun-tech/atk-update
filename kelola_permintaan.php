@@ -67,6 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['do'] ?? '') === 'update_st
 }
 
 if (($_GET['action'] ?? '') === 'delete' && isset($_GET['id'])) {
+    csrf_check_get();
     $id = (int)$_GET['id'];
 
     $pdo->beginTransaction();
@@ -163,7 +164,7 @@ require __DIR__ . '/includes/header.php';
       </div>
       <div class="pq-top-right">
         <span class="st-badge <?= permintaan_status_class($r['status']) ?>"><?= e(permintaan_status_label($r['status'])) ?></span>
-        <a class="icon-btn danger" href="?action=delete&id=<?= e($r['id']) ?>" title="Hapus permintaan"
+        <a class="icon-btn danger" href="?action=delete&id=<?= e($r['id']) ?>&csrf=<?= e(csrf_token()) ?>" title="Hapus permintaan"
            onclick="return confirm('Hapus permintaan ini?<?= $r['status'] !== 'ditolak' ? ' Stok yang tertahan akan dikembalikan otomatis.' : '' ?>');">Hapus</a>
       </div>
     </div>

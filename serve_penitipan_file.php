@@ -39,6 +39,7 @@ $mimeMap = [
 ];
 $mime = $mimeMap[$ext] ?? 'application/octet-stream';
 
+header('X-Content-Type-Options: nosniff');
 header('Content-Type: ' . $mime);
 header('Content-Length: ' . filesize($path));
 header('Content-Disposition: ' . ($forceDownload ? 'attachment' : 'inline') . '; filename="' . basename($row['file']) . '"');

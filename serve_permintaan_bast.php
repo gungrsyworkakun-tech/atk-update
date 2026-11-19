@@ -19,6 +19,7 @@ if (!is_file($path)) { http_response_code(404); exit('Berkas tidak ditemukan di 
 $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
 $mime = ['pdf' => 'application/pdf', 'jpg' => 'image/jpeg', 'jpeg' => 'image/jpeg', 'png' => 'image/png', 'webp' => 'image/webp'][$ext] ?? 'application/octet-stream';
 $disposition = !empty($_GET['download']) ? 'attachment' : 'inline';
+header('X-Content-Type-Options: nosniff');
 header('Content-Type: ' . $mime);
 header('Content-Disposition: ' . $disposition . '; filename="' . basename($path) . '"');
 readfile($path);
