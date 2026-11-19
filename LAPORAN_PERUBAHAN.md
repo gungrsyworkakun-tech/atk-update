@@ -135,6 +135,14 @@ Baru: `aktivitas.php`, `includes/activity_log.php`. Diubah: `index.php`, `includ
 - Admin bidang: banner judul berwarna, kartu ringkasan (total/menunggu/diproses/selesai), dan kartu permintaan dengan alur status Diajukan → Diproses → Selesai.
 - File: `notifikasi.php` (aksi `live`), `includes/header.php`, `progres.php`, `permintaan.php`, `assets/style.css`.
 
+### 5. Kalender pengambilan, foto di permintaan, pengingat BAST
+- Menu baru **Kalender Pengambilan** untuk admin bidang, admin gudang (yang punya akses Permintaan ATK Bidang), dan super admin. Tiap tanggal diberi titik warna: hijau selesai, merah belum upload BAST, biru diproses, kuning menunggu, abu-abu ditolak.
+- Klik tanggal: terlihat permintaan hari itu, barangnya (dengan foto dan jumlah), status, dan apakah BAST sudah diunggah.
+- Admin bidang hanya melihat bidangnya. Admin gudang dan super admin melihat semua bidang, bisa disaring per bidang, dan ada rekap per bidang (total, belum selesai, belum upload BAST).
+- Pengingat BAST untuk admin bidang: spanduk merah di semua halaman dan pop-up tiap 10 menit selama permintaan berstatus Diproses/Selesai belum punya BAST.
+- Halaman Permintaan ATK Bidang (admin) dan Input BAST (bidang) sekarang menampilkan foto serta rincian barang.
+- File: `kalender.php` (baru), `includes/header.php`, `includes/functions.php`, `kelola_permintaan.php`, `input_bast.php`, `assets/style.css`.
+
 ## Yang masih perlu kamu lakukan
 
 1. **Tambahkan GD ke `Dockerfile`** supaya tidak hilang saat container dibuat ulang:
