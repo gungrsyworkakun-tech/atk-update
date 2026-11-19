@@ -14,7 +14,7 @@ require __DIR__ . '/includes/header.php';
       padding:0 0 16px;margin-bottom:16px;border-bottom:2px solid #1B2A3D;
     }
     .bc-print-header img{width:40px;height:40px;border-radius:9px;flex-shrink:0;}
-    .bc-print-header .ph-name{font-family:'Space Grotesk',Arial,sans-serif;font-size:17px;font-weight:700;color:#1B2A3D;}
+    .bc-print-header .ph-name{font-family:'Plus Jakarta Sans',Arial,sans-serif;font-size:17px;font-weight:700;color:#1B2A3D;}
     .bc-print-header .ph-sub{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5B6459;letter-spacing:.08em;text-transform:uppercase;margin-top:1px;}
     .bc-print-header .ph-date{margin-left:auto;font-size:11px;color:#5B6459;}
   }

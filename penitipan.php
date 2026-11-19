@@ -301,16 +301,16 @@ require __DIR__ . '/includes/header.php';
     border-radius:var(--radius-lg);padding:16px 20px;margin:18px 0;}
   .pn-summary-item{display:flex;flex-direction:column;}
   .pn-summary-label{font-size:11px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:.05em;}
-  .pn-summary-value{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;margin-top:3px;}
+  .pn-summary-value{font-family:'Plus Jakarta Sans',sans-serif;font-size:22px;font-weight:700;margin-top:3px;}
 
   .pn-toolbar{display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap;}
   .pn-search{flex:1;min-width:220px;position:relative;}
   .pn-search input{width:100%;padding:10px 14px 10px 38px;border:1.5px solid var(--line);border-radius:var(--radius-sm);
-    background:var(--paper-sunk);color:var(--text);font-size:13.5px;font-family:'Inter',Arial,sans-serif;box-sizing:border-box;}
+    background:var(--paper-sunk);color:var(--text);font-size:13.5px;font-family:'Plus Jakarta Sans',Arial,sans-serif;box-sizing:border-box;}
   .pn-search input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(59,130,246,.16);}
   .pn-search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);opacity:.55;pointer-events:none;}
   .pn-status-select{padding:9px 12px;border:1.5px solid var(--line);border-radius:var(--radius-sm);
-    background:var(--paper-sunk);color:var(--text);font-size:13px;font-family:'Inter',Arial,sans-serif;}
+    background:var(--paper-sunk);color:var(--text);font-size:13px;font-family:'Plus Jakarta Sans',Arial,sans-serif;}
 
   .pn-table-wrap{background:var(--paper-card);border:1px solid var(--line);border-radius:var(--radius);
     overflow:hidden;box-shadow:var(--shadow-card);}
@@ -330,7 +330,7 @@ require __DIR__ . '/includes/header.php';
   .pn-doc-cell{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
   .pn-thumb{width:36px;height:36px;border-radius:6px;object-fit:cover;border:1px solid var(--line);cursor:pointer;flex-shrink:0;}
   .pn-doc-btn{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);background:var(--paper-sunk);
-    color:var(--text-dim);border-radius:6px;padding:5px 9px;font-size:11px;cursor:pointer;font-family:'Inter',Arial,sans-serif;}
+    color:var(--text-dim);border-radius:6px;padding:5px 9px;font-size:11px;cursor:pointer;font-family:'Plus Jakarta Sans',Arial,sans-serif;}
   .pn-doc-btn:hover{border-color:var(--accent);color:var(--accent);}
 
   .pn-modal-overlay{position:fixed;inset:0;background:rgba(6,9,16,.75);z-index:200;
@@ -343,7 +343,7 @@ require __DIR__ . '/includes/header.php';
     cursor:pointer;color:var(--text-dim);z-index:10;}
   .pn-modal-close:hover{background:var(--accent);color:#fff;}
   .pn-modal-header{padding:22px 28px 18px;border-bottom:1px solid var(--line-soft);}
-  .pn-modal-header h3{margin:0;font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;}
+  .pn-modal-header h3{margin:0;font-family:'Plus Jakarta Sans',sans-serif;font-size:18px;font-weight:700;}
   .pn-modal-header p{margin:4px 0 0;font-size:12.5px;color:var(--text-dim);}
   .pn-modal-body{padding:22px 28px 8px;display:flex;flex-direction:column;gap:14px;}
   .pn-field{display:flex;flex-direction:column;gap:6px;}
@@ -351,9 +351,9 @@ require __DIR__ . '/includes/header.php';
   @media (max-width:480px){ .pn-field-row{grid-template-columns:1fr;} }
   .pn-label{font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.04em;font-weight:700;}
   .pn-input{width:100%;padding:9px 11px;border:1.5px solid var(--line);border-radius:8px;
-    background:var(--paper-sunk);color:var(--text);font-size:13px;box-sizing:border-box;font-family:'Inter',Arial,sans-serif;}
+    background:var(--paper-sunk);color:var(--text);font-size:13px;box-sizing:border-box;font-family:'Plus Jakarta Sans',Arial,sans-serif;}
   .pn-input:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 3px rgba(59,130,246,.16);}
-  .pn-textarea{resize:vertical;min-height:52px;line-height:1.5;font-family:'Inter',Arial,sans-serif;overflow-y:hidden;}
+  .pn-textarea{resize:vertical;min-height:52px;line-height:1.5;font-family:'Plus Jakarta Sans',Arial,sans-serif;overflow-y:hidden;}
   .pn-modal-footer{display:flex;justify-content:space-between;align-items:center;gap:10px;
     padding:16px 28px 22px;flex-wrap:wrap;}
   .pn-modal-footer-right{display:flex;gap:10px;}
@@ -555,7 +555,7 @@ require __DIR__ . '/includes/header.php';
                 <button type="submit" class="btn btn-ghost">Batalkan</button>
               </form>
             <?php endif; ?>
-            <a class="btn btn-ghost" style="color:#f87171;" href="penitipan.php?action=delete&id=<?= (int)$r['id'] ?>" onclick="return confirm('Hapus catatan titipan ini?');">Hapus</a>
+            <a class="btn btn-ghost" style="color:#DC2626;" href="penitipan.php?action=delete&id=<?= (int)$r['id'] ?>" onclick="return confirm('Hapus catatan titipan ini?');">Hapus</a>
           </div>
         </td>
       </tr>

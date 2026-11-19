@@ -134,10 +134,10 @@ require __DIR__ . '/includes/header.php';
   .pq-top-right{display:flex;align-items:center;gap:8px;}
 
   .st-badge{font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:20px;white-space:nowrap;}
-  .st-menunggu{background:rgba(224,178,53,.15);color:#e0b235;}
+  .st-menunggu{background:rgba(245,158,11,.14);color:#B45309;}
   .st-diproses{background:rgba(76,140,255,.15);color:#4c8cff;}
-  .st-selesai{background:rgba(76,175,140,.15);color:#4caf8c;}
-  .st-ditolak{background:rgba(224,82,82,.15);color:#e05252;}
+  .st-selesai{background:rgba(76,175,140,.15);color:#0B7A5C;}
+  .st-ditolak{background:rgba(220,38,38,.10);color:#DC2626;}
 
   .pq-form{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin-top:12px;border-top:1px solid var(--line,#232a35);padding-top:12px;}
   .pq-form .field{margin:0;}

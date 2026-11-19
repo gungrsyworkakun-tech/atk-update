@@ -34,28 +34,20 @@ function nav_item($file, $label, $iconName, $badge = 0) {
     echo '<a class="nav-item ' . $active . '" href="' . e(clean_url($file)) . '">';
     echo '<span class="nav-ic">' . icon($iconName, 17) . '</span>';
     echo '<span class="lbl">' . e($label) . '</span>';
-    if ($badge > 0) echo '<span class="nav-badge" style="margin-left:auto;background:#e05252;color:#fff;border-radius:20px;font-size:10.5px;font-weight:700;padding:1px 7px;">' . (int)$badge . '</span>';
+    if ($badge > 0) echo '<span class="nav-badge" style="margin-left:auto;background:#DC2626;color:#fff;border-radius:20px;font-size:10.5px;font-weight:700;padding:1px 7px;">' . (int)$badge . '</span>';
     echo '</a>';
 }
 ?>
 <!DOCTYPE html>
-<html lang="id" data-theme="dark">
+<html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pendataan ATK</title>
 <link rel="icon" type="image/png" href="assets/1.png?v=<?= @filemtime(dirname(__DIR__).'/assets/1.png') ?: time() ?>">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/style.css?v=<?= @filemtime(dirname(__DIR__) . '/assets/style.css') ?: time() ?>">
-<script>
-  // Terapkan tema tersimpan sebelum render agar tidak ada "kedipan" warna.
-  (function(){
-    try {
-      var t = localStorage.getItem('atk-theme');
-      if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
-    } catch(e){}
-  })();
-</script>
 </head>
 <body>
 <div class="app">
@@ -87,7 +79,7 @@ function nav_item($file, $label, $iconName, $badge = 0) {
           <?php nav_item('analitik.php', 'Dashboard Analitik', 'gauge'); ?>
         </div>
 
-        <?php if (has_permission('barang_masuk_keluar') || has_permission('barcode') || has_permission('data_barang') || has_permission('bast') || has_permission('realisasi') || has_permission('harga') || has_permission('bidang') || has_permission('kelola_permintaan') || has_permission('asisten_ai') || has_permission('penitipan') || has_permission('kirim_notifikasi') || has_permission('opname')): ?>
+        <?php if (has_permission('barang_masuk_keluar') || has_permission('barcode') || has_permission('data_barang') || has_permission('bast') || has_permission('realisasi') || has_permission('harga') || has_permission('bidang') || has_permission('kelola_permintaan') || has_permission('penitipan') || has_permission('kirim_notifikasi') || has_permission('opname')): ?>
         <div class="nav-group">
           <div class="nav-group-label">Data ATK</div>
           <?php if (has_permission('barang_masuk_keluar')): nav_item('transaksi.php', MODULES['barang_masuk_keluar'], MODULE_META['barang_masuk_keluar']['icon']); endif; ?>
@@ -101,7 +93,6 @@ function nav_item($file, $label, $iconName, $badge = 0) {
           <?php if (has_permission('penitipan')): nav_item('penitipan.php', MODULES['penitipan'], MODULE_META['penitipan']['icon']); endif; ?>
           <?php if (has_permission('kirim_notifikasi')): nav_item('kirim_notifikasi.php', MODULES['kirim_notifikasi'], MODULE_META['kirim_notifikasi']['icon']); endif; ?>
           <?php if (has_permission('opname')): nav_item('opname.php', MODULES['opname'], MODULE_META['opname']['icon']); endif; ?>
-          <?php if (has_permission('asisten_ai')): nav_item('asisten_ai.php', MODULES['asisten_ai'], MODULE_META['asisten_ai']['icon']); endif; ?>
         </div>
         <?php endif; ?>
 
@@ -115,24 +106,6 @@ function nav_item($file, $label, $iconName, $badge = 0) {
       <?php endif; ?>
     </div>
 
-    <div class="sidebar-foot">
-      <button class="theme-toggle" id="theme-toggle" type="button" title="Ganti tema terang/gelap">
-        <?= icon('sun', 16) ?><span class="lbl">Pilih Tema</span>
-      </button>
-      <details class="userchip">
-        <summary>
-          <span class="avatar"><?= e(mb_strtoupper(mb_substr($u['username'], 0, 2))) ?></span>
-          <span class="uc-info lbl">
-            <span class="name"><?= e($u['username']) ?></span>
-            <span class="role"><?= is_super() ? 'Super Admin' : (is_bidang() ? 'Admin Bidang' : 'Admin Biasa') ?></span>
-          </span>
-          <?= icon('chevron-down', 15) ?>
-        </summary>
-        <div class="uc-panel">
-          <a class="uc-link danger" href="<?= clean_url('logout.php') ?>"><?= icon('logout', 15) ?> Keluar</a>
-        </div>
-      </details>
-    </div>
   </div>
 
   <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
@@ -140,15 +113,9 @@ function nav_item($file, $label, $iconName, $badge = 0) {
   <div class="content-col">
     <div class="topbar">
       <button class="icon-btn-ghost" id="sidebar-toggle" type="button" title="Lipat/lebarkan sidebar"><?= icon('sidebar', 18) ?></button>
-      <div class="crumb">
-        <a href="<?= clean_url(is_bidang() ? 'permintaan.php' : 'index.php') ?>"><?= is_bidang() ? 'Permintaan ATK' : 'Dashboard' ?></a>
-        <?php if ($breadcrumbLabel && $currentPage !== 'index.php' && $currentPage !== 'permintaan.php'): ?>
-          <span class="crumb-sep"><?= icon('chevron-right', 14) ?></span>
-          <span class="crumb-current"><?= e($breadcrumbLabel) ?></span>
-        <?php endif; ?>
-      </div>
-      <?php if (!is_bidang()): ?>
+      <h1 class="page-title"><?= e($breadcrumbLabel ?: 'Pendataan ATK') ?></h1>
       <div class="topbar-right">
+      <?php if (!is_bidang()): ?>
         <div class="notif-wrap" id="notif-wrap">
           <button class="icon-btn-ghost notif-bell" id="notif-bell" type="button" title="Notifikasi">
             <?= icon('bell', 18) ?>
@@ -167,21 +134,21 @@ function nav_item($file, $label, $iconName, $badge = 0) {
         <style>
           .notif-wrap{position:relative;}
           .notif-bell{position:relative;}
-          .notif-dot{position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:#f43f5e;box-shadow:0 0 0 2px var(--panel,#12161c);}
-          .notif-panel{display:none;position:absolute;top:calc(100% + 6px);right:0;width:340px;max-height:400px;overflow-y:auto;background:var(--panel,#12161c);border:1px solid var(--line,#232a35);border-radius:8px;box-shadow:0 12px 28px rgba(0,0,0,.35);z-index:50;}
+          .notif-dot{position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:#f43f5e;box-shadow:0 0 0 2px var(--paper-card);}
+          .notif-panel{display:none;position:absolute;top:calc(100% + 6px);right:0;width:340px;max-height:400px;overflow-y:auto;background:var(--paper-card);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 28px rgba(16,24,40,.16);z-index:50;}
           .notif-panel.show{display:block;}
-          .notif-panel-head{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid var(--line,#232a35);font-size:12.5px;font-weight:600;}
-          .notif-panel-head button{background:none;border:none;color:var(--accent,#a78bfa);font-size:11.5px;cursor:pointer;padding:0;}
+          .notif-panel-head{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid var(--line);font-size:12.5px;font-weight:600;}
+          .notif-panel-head button{background:none;border:none;color:var(--accent);font-size:11.5px;cursor:pointer;padding:0;}
           .notif-panel-head button:hover{text-decoration:underline;}
-          .notif-item{display:block;padding:10px 12px;border-bottom:1px solid var(--line,#232a35);text-decoration:none;color:inherit;cursor:pointer;}
+          .notif-item{display:block;padding:10px 12px;border-bottom:1px solid var(--line);text-decoration:none;color:inherit;cursor:pointer;}
           .notif-item:last-child{border-bottom:none;}
-          .notif-item:hover{background:var(--line,#232a35);}
-          .notif-item.unread{background:rgba(167,139,250,.07);}
+          .notif-item:hover{background:var(--paper-sunk);}
+          .notif-item.unread{background:rgba(63,79,168,.06);}
           .notif-item .ni-title{font-weight:600;font-size:13px;display:flex;align-items:center;gap:6px;}
           .notif-item .ni-title .ni-dot{width:6px;height:6px;border-radius:50%;background:#f43f5e;flex-shrink:0;}
-          .notif-item .ni-msg{font-size:12px;color:var(--text-dim,#8b95a5);margin-top:3px;line-height:1.4;}
-          .notif-item .ni-time{font-size:10.5px;color:var(--text-dim,#8b95a5);margin-top:4px;}
-          .notif-empty{padding:20px 12px;text-align:center;font-size:12.5px;color:var(--text-dim,#8b95a5);}
+          .notif-item .ni-msg{font-size:12px;color:var(--text-dim);margin-top:3px;line-height:1.4;}
+          .notif-item .ni-time{font-size:10.5px;color:var(--text-dim);margin-top:4px;}
+          .notif-empty{padding:20px 12px;text-align:center;font-size:12.5px;color:var(--text-dim);}
         </style>
         <div class="search-pill" id="global-search-wrap">
           <?= icon('search', 15) ?>
@@ -190,17 +157,27 @@ function nav_item($file, $label, $iconName, $badge = 0) {
         </div>
         <style>
           #global-search-wrap{position:relative;}
-          .gs-results{display:none;position:absolute;top:calc(100% + 6px);right:0;width:320px;max-height:360px;overflow-y:auto;background:var(--panel,#12161c);border:1px solid var(--line,#232a35);border-radius:8px;box-shadow:0 12px 28px rgba(0,0,0,.35);z-index:50;padding:6px;}
+          .gs-results{display:none;position:absolute;top:calc(100% + 6px);right:0;width:320px;max-height:360px;overflow-y:auto;background:var(--paper-card);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 28px rgba(16,24,40,.16);z-index:50;padding:6px;}
           .gs-results.show{display:block;}
-          .gs-group-label{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--text-dim,#8b95a5);padding:6px 8px 2px;}
+          .gs-group-label{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--text-dim);padding:6px 8px 2px;}
           .gs-item{display:flex;flex-direction:column;gap:2px;padding:8px;border-radius:6px;text-decoration:none;color:inherit;}
-          .gs-item:hover{background:var(--line,#232a35);}
+          .gs-item:hover{background:var(--paper-sunk);}
           .gs-item .gs-title{font-weight:600;font-size:13.5px;}
-          .gs-item .gs-sub{font-size:12px;color:var(--text-dim,#8b95a5);}
-          .gs-empty{padding:10px 8px;font-size:12.5px;color:var(--text-dim,#8b95a5);}
+          .gs-item .gs-sub{font-size:12px;color:var(--text-dim);}
+          .gs-empty{padding:10px 8px;font-size:12.5px;color:var(--text-dim);}
         </style>
-      </div>
       <?php endif; ?>
+        <details class="userchip userchip-top" id="userchip-top">
+          <summary title="<?= e($u['username']) ?>"><span class="avatar"><?= e(mb_strtoupper(mb_substr($u['username'], 0, 1))) ?></span></summary>
+          <div class="uc-panel">
+            <div class="uc-who">
+              <b><?= e($u['username']) ?></b>
+              <span><?= is_super() ? 'Super Admin' : (is_bidang() ? 'Admin Bidang' : 'Admin Biasa') ?></span>
+            </div>
+            <a class="uc-link danger" href="<?= clean_url('logout.php') ?>"><?= icon('logout', 15) ?> Keluar</a>
+          </div>
+        </details>
+      </div>
     </div>
 
     <input type="hidden" id="globalCsrfToken" value="<?= e(csrf_token()) ?>">
@@ -302,7 +279,7 @@ function nav_item($file, $label, $iconName, $badge = 0) {
       <?php endif; ?>
       <?php if (is_bidang() && $operBaru > 0 && $currentPage !== 'riwayat_ambil.php'): ?>
         <div class="flash ok">
-          🔔 Ada <b><?= (int)$operBaru ?></b> kiriman barang baru dari admin ATK.
+          Ada <b><?= (int)$operBaru ?></b> kiriman barang baru dari admin ATK.
           <a href="<?= clean_url('riwayat_ambil.php') ?>" style="font-weight:700;text-decoration:underline;margin-left:6px;">Lihat &amp; buat BAST</a>
         </div>
       <?php endif; ?>

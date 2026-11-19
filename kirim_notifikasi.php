@@ -52,12 +52,12 @@ require __DIR__ . '/includes/header.php';
 
   .kn-form-card{background:var(--paper-card);border:1px solid var(--line);border-radius:var(--radius);
     padding:20px;box-shadow:var(--shadow-card);}
-  .kn-form-card h3{margin:0 0 4px;font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;}
+  .kn-form-card h3{margin:0 0 4px;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;}
   .kn-form-card .kn-hint{font-size:12px;color:var(--text-dim);margin:0 0 16px;line-height:1.5;}
   .kn-field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
   .kn-label{font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.04em;font-weight:700;}
   .kn-input, .kn-textarea{width:100%;padding:9px 11px;border:1.5px solid var(--line);border-radius:8px;
-    background:var(--paper-sunk);color:var(--text);font-size:13.5px;box-sizing:border-box;font-family:'Inter',Arial,sans-serif;}
+    background:var(--paper-sunk);color:var(--text);font-size:13.5px;box-sizing:border-box;font-family:'Plus Jakarta Sans',Arial,sans-serif;}
   .kn-textarea{resize:vertical;min-height:110px;line-height:1.5;}
   .kn-input:focus, .kn-textarea:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 3px rgba(59,130,246,.16);}
   .kn-submit{width:100%;justify-content:center;min-height:40px;}
@@ -125,7 +125,7 @@ require __DIR__ . '/includes/header.php';
             </div>
             <span class="kn-badge <?= $r['jumlah_dibaca'] > 0 ? 'read' : 'unread' ?>"><?= (int)$r['jumlah_dibaca'] ?>/<?= $totalAdmin ?> admin baca</span>
           </div>
-          <a class="btn btn-ghost" style="color:#f87171;font-size:11.5px;padding:6px 10px;margin-top:10px;display:inline-block;"
+          <a class="btn btn-ghost" style="color:#DC2626;font-size:11.5px;padding:6px 10px;margin-top:10px;display:inline-block;"
              href="kirim_notifikasi.php?action=delete&id=<?= (int)$r['id'] ?>"
              onclick="return confirm('Batalkan pengumuman ini? Ini akan langsung hilang dari bel notifikasi semua admin.');">Batalkan</a>
         </div>

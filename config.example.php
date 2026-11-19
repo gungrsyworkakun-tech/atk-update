@@ -17,5 +17,3 @@ try {
     die('Koneksi database gagal. Pastikan database sudah dibuat dari schema.sql. Detail: ' . $e->getMessage());
 }
 
-// API key asisten AI (opsional). Bisa juga lewat environment variable GROQ_API_KEY.
-// define('GROQ_API_KEY', 'isi_api_key_di_sini');

@@ -172,13 +172,13 @@ require __DIR__ . '/includes/header.php';
     border-radius:var(--radius-lg);padding:16px 20px;margin:18px 0;}
   .db-summary-item{display:flex;flex-direction:column;}
   .db-summary-label{font-size:11px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:.05em;}
-  .db-summary-value{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;margin-top:3px;}
-  .db-summary-value.danger{color:#f87171;}
+  .db-summary-value{font-family:'Plus Jakarta Sans',sans-serif;font-size:22px;font-weight:700;margin-top:3px;}
+  .db-summary-value.danger{color:#DC2626;}
 
   .db-toolbar{display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap;}
   .db-search{flex:1;min-width:220px;position:relative;}
   .db-search input{width:100%;padding:10px 14px 10px 38px;border:1.5px solid var(--line);border-radius:var(--radius-sm);
-    background:var(--paper-sunk);color:var(--text);font-size:13.5px;font-family:'Inter',Arial,sans-serif;box-sizing:border-box;}
+    background:var(--paper-sunk);color:var(--text);font-size:13.5px;font-family:'Plus Jakarta Sans',Arial,sans-serif;box-sizing:border-box;}
   .db-search input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(59,130,246,.16);}
   .db-search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);opacity:.55;pointer-events:none;}
   .db-count{font-size:12px;color:var(--text-dim);white-space:nowrap;}
@@ -224,7 +224,7 @@ require __DIR__ . '/includes/header.php';
   .db-modal-close:hover{background:var(--accent);color:#fff;}
 
   .db-modal-header{padding:22px 28px 18px;border-bottom:1px solid var(--line-soft);}
-  .db-modal-header h3{margin:0;font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;}
+  .db-modal-header h3{margin:0;font-family:'Plus Jakarta Sans',sans-serif;font-size:18px;font-weight:700;}
   .db-modal-header p{margin:4px 0 0;font-size:12.5px;color:var(--text-dim);}
 
   .db-modal-body{padding:22px 28px 26px;display:grid;grid-template-columns:220px 1fr;gap:26px;}
@@ -267,15 +267,15 @@ require __DIR__ . '/includes/header.php';
 
   .db-shopee-label{font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.04em;font-weight:700;}
   .db-shopee-input{width:100%;padding:9px 11px;border:1.5px solid var(--line);border-radius:8px;
-    background:var(--paper-card);color:var(--text);font-size:13px;box-sizing:border-box;font-family:'Inter',Arial,sans-serif;}
+    background:var(--paper-card);color:var(--text);font-size:13px;box-sizing:border-box;font-family:'Plus Jakarta Sans',Arial,sans-serif;}
   .db-shopee-input:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 3px rgba(59,130,246,.16);}
 
-  .db-nama-input{font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;padding:10px 12px;}
+  .db-nama-input{font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;font-weight:700;padding:10px 12px;}
 
   .db-harga-wrap{position:relative;}
   .db-harga-wrap::before{content:'Rp';position:absolute;left:12px;top:50%;transform:translateY(-50%);
     font-size:12px;font-weight:700;color:var(--text-dim);pointer-events:none;}
-  .db-harga-wrap input{padding-left:34px;font-family:'Space Grotesk',sans-serif;font-weight:700;color:var(--accent);}
+  .db-harga-wrap input{padding-left:34px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;color:var(--accent);}
 
   .db-hapus-foto-check{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--text-dim);
     cursor:pointer;font-weight:500;margin-top:2px;}
@@ -289,7 +289,7 @@ require __DIR__ . '/includes/header.php';
   .db-unit-row-text{flex:1;color:var(--text-dim);}
   .db-unit-row-remove{border:none;background:transparent;color:var(--text-faint);cursor:pointer;font-size:14px;
     padding:2px 6px;border-radius:6px;flex-shrink:0;}
-  .db-unit-row-remove:hover{background:rgba(248,113,113,.15);color:#f87171;}
+  .db-unit-row-remove:hover{background:rgba(220,38,38,.10);color:#DC2626;}
   .db-unit-empty{font-size:11.5px;color:var(--text-faint);font-style:italic;padding:2px 0 8px;}
   .db-unit-add-row{display:flex;gap:8px;align-items:center;}
   .db-unit-add-row input{padding:8px 10px;border:1.5px solid var(--line);border-radius:8px;background:var(--paper-card);
@@ -520,7 +520,7 @@ require __DIR__ . '/includes/header.php';
       </div>
 
       <div class="db-modal-footer">
-        <a href="#" class="btn btn-ghost" id="dbModalHapusBtn" style="display:none; color:#f87171;" onclick="return confirm('Yakin ingin menghapus barang ini? Riwayat transaksi terkait ikut terhapus.');">Hapus Barang</a>
+        <a href="#" class="btn btn-ghost" id="dbModalHapusBtn" style="display:none; color:#DC2626;" onclick="return confirm('Yakin ingin menghapus barang ini? Riwayat transaksi terkait ikut terhapus.');">Hapus Barang</a>
         <div class="db-modal-footer-right">
           <button type="button" class="btn btn-ghost" id="dbModalCancelBtn">Batal</button>
           <button type="submit" class="btn btn-primary" style="padding:10px 24px;font-size:13.5px;">Simpan Data</button>

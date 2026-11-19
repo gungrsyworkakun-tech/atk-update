@@ -30,7 +30,7 @@ require __DIR__ . '/includes/header.php';
 ?>
 <style>
   .op-stats { display:flex; gap:10px; flex-wrap:wrap; margin:0 0 14px; }
-  .op-chip { background:var(--card, rgba(255,255,255,.04)); border:1px solid var(--border, rgba(255,255,255,.1)); border-radius:12px; padding:10px 16px; min-width:130px; }
+  .op-chip { background:var(--card, #fff); border:1px solid var(--border, var(--line)); border-radius:12px; padding:10px 16px; min-width:130px; }
   .op-chip b { display:block; font-size:20px; line-height:1.2; }
   .op-chip span { font-size:11.5px; color:var(--text-dim); }
   .op-form { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:12px 14px; align-items:end; }
@@ -39,7 +39,7 @@ require __DIR__ . '/includes/header.php';
   .op-form .wide { grid-column:span 2; }
   .op-check { display:flex; align-items:center; gap:8px; font-size:13px; padding-bottom:10px; cursor:pointer; }
   .op-actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:14px; }
-  .op-stage { background:rgba(0,0,0,.18); border:1px solid var(--border, rgba(255,255,255,.08)); border-radius:14px; padding:20px 10px; overflow-x:auto; }
+  .op-stage { background:var(--paper-sunk); border:1px solid var(--border, var(--line)); border-radius:14px; padding:20px 10px; overflow-x:auto; }
   .op-sheet { width:210mm; min-height:297mm; margin:0 auto 20px; background:#fff; color:#000; padding:12mm 12mm 10mm; border-radius:3px; box-shadow:0 6px 24px rgba(0,0,0,.35); font-family:Arial,Helvetica,sans-serif; }
   .op-sheet h1 { text-align:center; font-size:16px; margin:0; letter-spacing:1px; color:#000; }
   .op-no { text-align:center; font-size:12px; margin:3px 0 10px; }
@@ -98,7 +98,7 @@ require __DIR__ . '/includes/header.php';
     <button class="btn btn-primary" type="submit" style="padding:9px 18px;">Terapkan</button>
     <button class="btn btn-ghost" type="button" onclick="window.print()" style="padding:9px 18px;">Cetak / Simpan PDF</button>
     <button class="btn btn-ghost" type="button" id="opCsv" style="padding:9px 18px;">Unduh Excel (CSV)</button>
-    <button class="btn btn-ghost" type="button" id="opReset" style="padding:9px 18px;color:#f87171;">Kosongkan isian</button>
+    <button class="btn btn-ghost" type="button" id="opReset" style="padding:9px 18px;color:#DC2626;">Kosongkan isian</button>
   </div>
 </form>
 

@@ -56,10 +56,10 @@ require __DIR__ . '/includes/header.php';
   .pq-edit-hint{font-size:11.5px;color:var(--text-dim,#8b95a5);}
 
   .st-badge{font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:20px;white-space:nowrap;}
-  .st-menunggu{background:rgba(224,178,53,.15);color:#e0b235;}
+  .st-menunggu{background:rgba(245,158,11,.14);color:#B45309;}
   .st-diproses{background:rgba(76,140,255,.15);color:#4c8cff;}
-  .st-selesai{background:rgba(76,175,140,.15);color:#4caf8c;}
-  .st-ditolak{background:rgba(224,82,82,.15);color:#e05252;}
+  .st-selesai{background:rgba(76,175,140,.15);color:#0B7A5C;}
+  .st-ditolak{background:rgba(220,38,38,.10);color:#DC2626;}
 </style>
 
 <div class="topline">
@@ -67,10 +67,10 @@ require __DIR__ . '/includes/header.php';
 </div>
 
 <?php if (!empty($_GET['msg'])): ?>
-  <div class="card" style="border-color:#4caf8c;"><div class="empty" style="color:#4caf8c;"><?= e($_GET['msg']) ?></div></div>
+  <div class="card" style="border-color:#0B7A5C;"><div class="empty" style="color:#0B7A5C;"><?= e($_GET['msg']) ?></div></div>
 <?php endif; ?>
 <?php if (!empty($_GET['err'])): ?>
-  <div class="card" style="border-color:#e05252;"><div class="empty" style="color:#e05252;"><?= e($_GET['err']) ?></div></div>
+  <div class="card" style="border-color:#DC2626;"><div class="empty" style="color:#DC2626;"><?= e($_GET['err']) ?></div></div>
 <?php endif; ?>
 
 <?php if (!$myRequests): ?>

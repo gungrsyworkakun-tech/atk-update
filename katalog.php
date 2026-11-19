@@ -22,7 +22,7 @@ require __DIR__ . '/includes/header.php';
   .cat-toolbar{display:flex;gap:10px;align-items:center;margin-bottom:18px;flex-wrap:wrap;}
   .cat-search{flex:1;min-width:220px;position:relative;}
   .cat-search input{width:100%;padding:10px 14px 10px 38px;border:1.5px solid var(--line);border-radius:var(--radius-sm);
-    background:var(--paper-sunk);color:var(--text);font-size:13.5px;font-family:'Inter',Arial,sans-serif;box-sizing:border-box;}
+    background:var(--paper-sunk);color:var(--text);font-size:13.5px;font-family:'Plus Jakarta Sans',Arial,sans-serif;box-sizing:border-box;}
   .cat-search input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(59,130,246,.16);}
   .cat-search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);opacity:.55;pointer-events:none;}
   .cat-count{font-size:12px;color:var(--text-dim);white-space:nowrap;}

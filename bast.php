@@ -72,8 +72,8 @@ require __DIR__ . '/includes/header.php';
   .bast-card{border:1px solid var(--line,#232a35);border-radius:12px;padding:14px;background:var(--panel,#12161c);display:flex;flex-direction:column;gap:10px;}
   .bast-card-top{display:flex;gap:10px;align-items:flex-start;}
   .bast-file-ic{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
-  .bast-file-ic.pdf{background:rgba(224,82,82,.15);color:#e05252;}
-  .bast-file-ic.img{background:rgba(76,175,140,.15);color:#4caf8c;}
+  .bast-file-ic.pdf{background:rgba(220,38,38,.10);color:#DC2626;}
+  .bast-file-ic.img{background:rgba(76,175,140,.15);color:#0B7A5C;}
   .bast-file-ic.empty{background:rgba(140,150,165,.12);color:var(--text-dim,#8b95a5);}
   .bast-meta{min-width:0;}
   .bast-item-name{font-weight:600;font-size:14px;line-height:1.3;}

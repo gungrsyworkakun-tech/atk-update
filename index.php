@@ -85,7 +85,7 @@ require __DIR__ . '/includes/header.php';
 ?>
 <div class="topline">
   <div>
-    <h1>Selamat datang, <?= e($u['username']) ?> 👋</h1>
+    <h1>Selamat datang, <?= e($u['username']) ?></h1>
     <div class="sub">Begini kondisi stok ATK hari ini.</div>
   </div>
   <div style="display:flex;gap:10px;">
@@ -134,12 +134,12 @@ require __DIR__ . '/includes/header.php';
 </details>
 
 <div class="grid-stats">
-  <div class="stat-card"><div class="label">Jenis barang</div><div class="val"><?= (int)$totalItem ?></div></div>
-  <div class="stat-card"><div class="label">Total stok</div><div class="val"><?= (int)$totalStok ?></div></div>
-  <div class="stat-card <?= $rendah > 0 ? 'danger' : '' ?>"><div class="label">Stok menipis</div><div class="val"><?= (int)$rendah ?></div></div>
-  <div class="stat-card"><div class="label">Nilai stok</div><div class="val" style="font-size:19px;"><?= format_rupiah($totalNilai) ?></div></div>
-  <div class="stat-card"><div class="label">Masuk · <?= e($periodeLabel) ?></div><div class="val"><?= (int)$masukPeriode ?></div></div>
-  <div class="stat-card"><div class="label">Keluar · <?= e($periodeLabel) ?></div><div class="val"><?= (int)$keluarPeriode ?></div></div>
+  <div class="stat-card"><span class="stat-ic g-indigo"><?= icon('box', 26) ?></span><div class="stat-body"><div class="val"><?= (int)$totalItem ?></div><div class="label">Jenis barang</div></div></div>
+  <div class="stat-card"><span class="stat-ic g-green"><?= icon('archive', 26) ?></span><div class="stat-body"><div class="val"><?= (int)$totalStok ?></div><div class="label">Total stok</div></div></div>
+  <div class="stat-card <?= $rendah > 0 ? 'danger' : '' ?>"><span class="stat-ic <?= $rendah > 0 ? 'g-red' : 'g-gray' ?>"><?= icon('gauge', 26) ?></span><div class="stat-body"><div class="val"><?= (int)$rendah ?></div><div class="label">Stok menipis</div></div></div>
+  <div class="stat-card"><span class="stat-ic g-indigo"><?= icon('tag', 26) ?></span><div class="stat-body"><div class="val" style="font-size:22px;"><?= format_rupiah($totalNilai) ?></div><div class="label">Nilai stok</div></div></div>
+  <div class="stat-card"><span class="stat-ic g-green"><?= icon('arrows', 26) ?></span><div class="stat-body"><div class="val"><?= (int)$masukPeriode ?></div><div class="label">Masuk · <?= e($periodeLabel) ?></div></div></div>
+  <div class="stat-card"><span class="stat-ic g-amber"><?= icon('arrows', 26) ?></span><div class="stat-body"><div class="val"><?= (int)$keluarPeriode ?></div><div class="label">Keluar · <?= e($periodeLabel) ?></div></div></div>
 </div>
 
 <div class="dash-columns">

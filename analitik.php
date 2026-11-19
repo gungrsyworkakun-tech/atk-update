@@ -85,7 +85,7 @@ require __DIR__ . '/includes/header.php';
   @media (max-width:900px){ .an-chart-grid{grid-template-columns:1fr;} }
   .an-chart-card{background:var(--paper-card);border:1px solid var(--line);border-radius:var(--radius);
     padding:20px 22px;box-shadow:var(--shadow-card);}
-  .an-chart-card h3{font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;margin:0 0 4px;}
+  .an-chart-card h3{font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;margin:0 0 4px;}
   .an-chart-sub{font-size:12px;color:var(--text-dim);margin-bottom:16px;}
   .an-chart-wrap{position:relative;height:260px;}
   .an-chart-wrap.short{height:220px;}
@@ -201,7 +201,7 @@ require __DIR__ . '/includes/header.php';
   var colTextDim = cs.getPropertyValue('--text-dim').trim() || '#8B93AC';
   var colLine = cs.getPropertyValue('--line-soft').trim() || '#1B2238';
 
-  Chart.defaults.font.family = "'Inter', Arial, sans-serif";
+  Chart.defaults.font.family = "'Plus Jakarta Sans', Arial, sans-serif";
   Chart.defaults.color = colTextDim;
   Chart.defaults.font.size = 11.5;
 

@@ -69,6 +69,42 @@ File cadangan (sebelum diubah) ada di komputermu dengan akhiran `.bak`: `barcode
 - Semua file PHP lolos pemeriksaan sintaks.
 - **Belum diuji:** tampilan cetak A4 di browser dan kecepatan di komputermu. Mohon dicoba.
 
+## Tahap 2: Asisten AI dihapus dan tampilan baru
+
+### Asisten AI dihapus
+- Menu **Asisten AI** hilang dari sidebar, dari kartu pintasan dashboard, dan dari daftar hak akses di Kelola Admin.
+- File dipindah ke folder cadangan `_cadangan_sebelum_tampilan_baru/` (ditutup dari akses web dan tidak ikut ke GitHub): `asisten_ai.php`, `export_ai_hasil.php`, `includes/ai_helper.php`, `includes/ai_analisis.php`. Di GitHub file-file itu dihapus.
+- API key AI dihapus dari `config.php` lokal. Dengan begitu poin 5 di atas ("API key dipindah ke config.php") sudah tidak berlaku. Kalau di **hosting** masih ada key itu di `config.php`, hapus juga.
+- Halaman **Dashboard Analitik** tidak memakai AI, jadi tetap ada.
+- Catatan lama dari hak akses admin yang berisi `asisten_ai` di database tidak mengganggu, hanya diabaikan.
+
+### Tampilan baru (mengikuti contoh yang kamu kirim)
+- Satu tema **terang**. Tombol "Pilih Tema" dan tema gelap dihapus.
+- **Sidebar putih**, label kelompok kecil, menu yang sedang dibuka berwarna **oranye** dengan garis oranye di tepi kiri.
+- **Topbar putih**: judul halaman di kiri; lonceng, kolom cari, dan **bulatan hijau berisi inisial** di kanan. Nama, peran, dan tombol Keluar ada di menu bulatan itu.
+- **Kartu statistik** di dashboard dengan ikon kotak berwarna dan angka besar.
+- **Tabel** lebih lega, judul kolom kecil huruf besar, status berupa pil dengan titik warna.
+- Font diganti **Plus Jakarta Sans**. Label huruf kecil monospasi serba kapital, emoji, dan efek bayangan gelap dihapus.
+- Warna cadangan gelap di beberapa halaman (Bast, Progres, Kelola Permintaan, Input BAST, Opname) disesuaikan agar terbaca di tema terang.
+- **Halaman login tidak diubah**: masih desain gelap dengan foto kantor.
+
+### Tambahan daftar file (tahap 2)
+| File | Status |
+|---|---|
+| `assets/style.css` | Diubah: tema terang, sidebar, topbar, kartu, tabel (bagian 5 di akhir file) |
+| `includes/header.php` | Diubah: sidebar, topbar baru, menu pengguna, tanpa tema gelap dan menu AI |
+| `includes/footer.php` | Diubah: warna jendela pratinjau, tutup menu pengguna, tanpa tombol tema |
+| `includes/functions.php` | Diubah: menu AI dibuang dari daftar modul |
+| `index.php` | Diubah: kartu statistik baru, tanpa emoji |
+| `config.example.php` | Diubah: contoh API key AI dibuang |
+| `data_barang.php`, `harga.php`, `katalog.php`, `analitik.php`, `barcode.php`, `penitipan.php`, `kirim_notifikasi.php`, `opname.php`, `bast.php`, `bidang.php`, `progres.php`, `riwayat_ambil.php`, `kelola_permintaan.php`, `includes/riwayat_helper.php` | Diubah kecil: font dan warna yang menyesuaikan tema terang |
+| `asisten_ai.php`, `export_ai_hasil.php`, `includes/ai_helper.php`, `includes/ai_analisis.php` | Dihapus dari proyek |
+
+### Pengujian tahap 2
+- Dashboard dan halaman tabel diperiksa lewat screenshot di lebar komputer dan HP.
+- Semua file PHP lolos pemeriksaan sintaks.
+- **Belum diuji di komputermu:** halaman lain (Transaksi, Permintaan, BAST, Penitipan, dan lainnya) memakai gaya sendiri-sendiri. Kalau ada yang warnanya janggal, kirim screenshot-nya.
+
 ## Yang masih perlu kamu lakukan
 
 1. **Tambahkan GD ke `Dockerfile`** supaya tidak hilang saat container dibuat ulang:

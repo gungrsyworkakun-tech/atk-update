@@ -16,15 +16,15 @@
 </div>
 
 <style>
-  .docv-overlay{position:fixed;inset:0;background:rgba(5,8,12,.72);z-index:200;align-items:center;justify-content:center;padding:24px;display:none;}
+  .docv-overlay{position:fixed;inset:0;background:rgba(17,24,39,.55);z-index:200;align-items:center;justify-content:center;padding:24px;display:none;}
   .docv-overlay:not([hidden]){display:flex;}
-  .docv-modal{background:var(--panel,#12161c);border:1px solid var(--line,#232a35);border-radius:14px;width:min(920px,100%);height:min(85vh,860px);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.5);}
-  .docv-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line,#232a35);}
+  .docv-modal{background:var(--paper-card);border:1px solid var(--line);border-radius:16px;width:min(920px,100%);height:min(85vh,860px);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.5);}
+  .docv-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line);}
   .docv-title{font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .docv-toolbar-actions{display:flex;align-items:center;gap:8px;flex-shrink:0;}
   .docv-toolbar-actions .btn{font-size:12.5px;padding:7px 14px;}
-  .docv-body{flex:1;background:#525659;display:flex;align-items:center;justify-content:center;overflow:auto;}
-  .docv-frame{width:100%;height:100%;border:none;background:#525659;}
+  .docv-body{flex:1;background:#E9EBF2;display:flex;align-items:center;justify-content:center;overflow:auto;}
+  .docv-frame{width:100%;height:100%;border:none;background:#E9EBF2;}
   .docv-img{max-width:100%;max-height:100%;object-fit:contain;}
 </style>
 
@@ -68,16 +68,11 @@
   });
   window.addEventListener('resize', function () { if (!isMobile()) closeMobileSidebar(); });
 
-  // Toggle tema terang/gelap
-  var themeBtn = document.getElementById('theme-toggle');
-  if (themeBtn) {
-    themeBtn.addEventListener('click', function () {
-      var html = document.documentElement;
-      var next = html.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
-      html.setAttribute('data-theme', next);
-      try { localStorage.setItem('atk-theme', next); } catch(e){}
-    });
-  }
+  // Tutup menu pengguna saat klik di luar
+  document.addEventListener('click', function (e) {
+    var uc = document.getElementById('userchip-top');
+    if (uc && uc.open && !uc.contains(e.target)) uc.open = false;
+  });
 
   // Pencarian global di topbar
   (function () {
