@@ -158,6 +158,29 @@ require __DIR__ . '/includes/header.php';
   <div class="stat-card"><span class="stat-ic g-amber"><?= icon('arrows', 26) ?></span><div class="stat-body"><div class="val"><?= (int)$keluarPeriode ?></div><div class="label">Keluar · <?= e($periodeLabel) ?></div></div></div>
 </div>
 
+<?php
+$lowList = $pdo->query('SELECT id, kode, nama, satuan, stok, stok_minimum FROM items WHERE stok_minimum > 0 AND stok <= stok_minimum ORDER BY (stok / stok_minimum) ASC, nama LIMIT 8')->fetchAll();
+if ($lowList): ?>
+<div class="card low-card">
+  <div class="low-head">
+    <h3><?= icon('gauge', 18) ?> Perlu segera dibeli <span class="low-count"><?= (int)$rendah ?> barang</span></h3>
+    <?php if (has_permission('realisasi')): ?><a class="btn btn-ghost" href="<?= e(clean_url('realisasi.php')) ?>">Atur batas stok</a><?php endif; ?>
+  </div>
+  <div class="low-list">
+    <?php foreach ($lowList as $lw):
+      $pct = max(0, min(100, (int)round($lw['stok'] / max(1, $lw['stok_minimum']) * 100)));
+      $habis = (int)$lw['stok'] <= 0; ?>
+      <div class="low-row">
+        <div class="low-name"><b><?= e($lw['nama']) ?></b><small><?= e($lw['kode']) ?></small></div>
+        <div class="low-bar"><span class="<?= $habis ? 'is-out' : '' ?>" style="width:<?= $pct ?>%"></span></div>
+        <div class="low-num <?= $habis ? 'is-out' : '' ?>"><?= $habis ? 'Habis' : (int)$lw['stok'] . ' ' . e($lw['satuan']) ?><small>batas <?= (int)$lw['stok_minimum'] ?></small></div>
+      </div>
+    <?php endforeach; ?>
+  </div>
+  <?php if ($rendah > count($lowList)): ?><div class="low-more">+ <?= (int)$rendah - count($lowList) ?> barang lain di bawah batas</div><?php endif; ?>
+</div>
+<?php endif; ?>
+
 <div class="dash-columns">
   <div class="dash-main">
     <div class="section-label"><span class="dot dot-blue"></span>Navigasi</div>

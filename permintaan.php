@@ -426,6 +426,23 @@ if ($editIdParam > 0) {
     }
 }
 
+// ---- Ajukan lagi: isi form baru dari permintaan lama (hanya milik akun ini, barang yang masih ada) ----
+$ulangPreset = [];
+$ulangDari = null;
+$ulangIdParam = (int)($_GET['ulang'] ?? 0);
+if ($ulangIdParam > 0 && !$editingRequest) {
+    $stmt = $pdo->prepare('SELECT * FROM permintaan WHERE id = ? AND user_id = ?');
+    $stmt->execute([$ulangIdParam, $u['id']]);
+    $ulangDari = $stmt->fetch() ?: null;
+    if ($ulangDari) {
+        $stmt = $pdo->prepare('SELECT pi.item_id, SUM(pi.jumlah) AS jumlah FROM permintaan_items pi JOIN items i ON i.id = pi.item_id WHERE pi.permintaan_id = ? GROUP BY pi.item_id ORDER BY MIN(pi.id)');
+        $stmt->execute([$ulangIdParam]);
+        foreach ($stmt->fetchAll() as $row) {
+            $ulangPreset[] = ['item_id' => (int)$row['item_id'], 'satuan_id' => 'base', 'jumlah' => max(1, (int)$row['jumlah'])];
+        }
+    }
+}
+
 // "Stok efektif" saat edit = stok saat ini + jumlah yang sudah dipakai permintaan
 // ini sebelumnya (karena stok itu sudah kadung dikurangi saat pertama kali
 // diajukan). Ini supaya slider jumlah di form tidak salah membatasi ke bawah.
@@ -461,6 +478,12 @@ if (!empty($flash) && $flash['type'] === 'ok' && strpos($flash['msg'], 'diajukan
     <div style="margin:10px 0;"><a href="progres" class="btn btn-ghost" style="font-size:12px;padding:6px 10px;">← Batal, kembali ke Progres ATK</a></div>
   <?php else: ?>
     <h3>Ajukan permintaan baru</h3>
+    <?php if ($ulangDari): ?>
+      <div class="req-intro" style="border-color:var(--accent);">
+        <?= icon('bell', 16) ?>
+        <span><?= $ulangPreset ? 'Form diisi dari permintaan ' . e(date('d M Y', strtotime($ulangDari['created_at']))) . '. Periksa jumlahnya, ubah kalau perlu, lalu ajukan.' : 'Barang pada permintaan lama itu sudah tidak ada di daftar, jadi form dibiarkan kosong.' ?></span>
+      </div>
+    <?php endif; ?>
     <div class="req-intro">
       <?= icon('bell', 16) ?>
       <span>Stok akan otomatis berkurang begitu permintaan diajukan. Jika permintaan ditolak admin, stok akan dikembalikan otomatis. Barang yang dipilih dari Katalog otomatis tersimpan di sini, meski Anda pindah halaman terlebih dahulu.</span>
@@ -522,6 +545,7 @@ if (!empty($flash) && $flash['type'] === 'ok' && strpos($flash['msg'], 'diajukan
   }, $items)) ?>;
   var satuanByItem = <?= json_encode($satuanByItem) ?>;
   var editPreset = <?= json_encode($editItemsPreset) ?>;
+  var ulangPreset = <?= json_encode($ulangPreset) ?>;
 
   var rowsWrap = document.getElementById('req-rows');
   var addBtn = document.getElementById('req-add-row');
@@ -809,7 +833,7 @@ if (!empty($flash) && $flash['type'] === 'ok' && strpos($flash['msg'], 'diajukan
       addRow();
     }
   } else {
-    var cart = readCart();
+    var cart = ulangPreset.length ? ulangPreset : readCart();
     var urlParams = new URLSearchParams(window.location.search);
     var urlItemId = urlParams.get('item_id');
     if (urlItemId && !cart.find(function (c) { return String(c.item_id) === String(urlItemId); })) {

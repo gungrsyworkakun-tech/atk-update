@@ -11,6 +11,7 @@ foreach (MODULES as $key => $label) {
 }
 $pageLabels['kelola_admin.php'] = 'Kelola Admin';
 $pageLabels['aktivitas.php'] = 'Riwayat Aktivitas';
+$pageLabels['backup.php'] = 'Backup Database';
 $pageLabels['kelola_bidang.php'] = 'Kelola Bidang';
 $pageLabels['analitik.php'] = 'Dashboard Analitik';
 $pageLabels['katalog.php'] = 'Katalog Barang';
@@ -27,6 +28,10 @@ $pendingReq = 0;
 if (!is_bidang() && has_permission('kelola_permintaan')) {
     try { $pendingReq = (int)($GLOBALS['pdo']->query("SELECT COUNT(*) FROM permintaan WHERE status = 'menunggu'")->fetchColumn()); } catch (Throwable $e) { $pendingReq = 0; }
 }
+$stokRendah = 0;
+if (!is_bidang() && has_permission('realisasi')) {
+    try { $stokRendah = (int)($GLOBALS['pdo']->query('SELECT COUNT(*) FROM items WHERE stok_minimum > 0 AND stok <= stok_minimum')->fetchColumn()); } catch (Throwable $e) { $stokRendah = 0; }
+}
 $bastBelum = 0;
 if (is_bidang()) {
     try {
@@ -42,13 +47,13 @@ function clean_url($file) {
     return preg_replace('/\.php(\?|$)/', '$1', $file);
 }
 
-function nav_item($file, $label, $iconName, $badge = 0) {
+function nav_item($file, $label, $iconName, $badge = 0, $live = true) {
     global $currentPage;
     $active = $currentPage === $file ? 'active' : '';
     echo '<a class="nav-item ' . $active . '" href="' . e(clean_url($file)) . '">';
     echo '<span class="nav-ic">' . icon($iconName, 17) . '</span>';
     echo '<span class="lbl">' . e($label) . '</span>';
-    if ($badge > 0) echo '<span class="nav-badge" data-live-badge style="margin-left:auto;background:#DC2626;color:#fff;border-radius:20px;font-size:10.5px;font-weight:700;padding:1px 7px;">' . (int)$badge . '</span>';
+    if ($badge > 0) echo '<span class="nav-badge"' . ($live ? ' data-live-badge' : '') . ' style="margin-left:auto;background:#DC2626;color:#fff;border-radius:20px;font-size:10.5px;font-weight:700;padding:1px 7px;">' . (int)$badge . '</span>';
     echo '</a>';
 }
 ?>
@@ -106,7 +111,7 @@ function nav_item($file, $label, $iconName, $badge = 0) {
           <?php if (has_permission('barcode')): nav_item('barcode.php', MODULES['barcode'], MODULE_META['barcode']['icon']); endif; ?>
           <?php if (has_permission('data_barang')): nav_item('data_barang.php', MODULES['data_barang'], MODULE_META['data_barang']['icon']); endif; ?>
           <?php if (has_permission('bast')): nav_item('bast.php', MODULES['bast'], MODULE_META['bast']['icon']); endif; ?>
-          <?php if (has_permission('realisasi')): nav_item('realisasi.php', MODULES['realisasi'], MODULE_META['realisasi']['icon']); endif; ?>
+          <?php if (has_permission('realisasi')): nav_item('realisasi.php', MODULES['realisasi'], MODULE_META['realisasi']['icon'], $stokRendah, false); endif; ?>
           <?php if (has_permission('harga')): nav_item('harga.php', MODULES['harga'], MODULE_META['harga']['icon']); endif; ?>
           <?php if (has_permission('bidang')): nav_item('bidang.php', MODULES['bidang'], MODULE_META['bidang']['icon']); endif; ?>
           <?php if (has_permission('kelola_permintaan')): nav_item('kelola_permintaan.php', MODULES['kelola_permintaan'], MODULE_META['kelola_permintaan']['icon'], $pendingReq); endif; ?>
@@ -122,6 +127,7 @@ function nav_item($file, $label, $iconName, $badge = 0) {
           <?php nav_item('aktivitas.php', 'Riwayat Aktivitas', 'clock'); ?>
           <?php nav_item('kelola_admin.php', 'Kelola Admin', ADMIN_META['kelola_admin']['icon']); ?>
           <?php nav_item('kelola_bidang.php', 'Kelola Bidang', ADMIN_META['kelola_bidang']['icon']); ?>
+          <?php nav_item('backup.php', 'Backup Database', 'archive'); ?>
         </div>
         <?php endif; ?>
       <?php endif; ?>

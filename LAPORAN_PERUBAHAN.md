@@ -172,3 +172,8 @@ Baru: `aktivitas.php`, `includes/activity_log.php`. Diubah: `index.php`, `includ
 - Logout kini menghapus token "ingat saya" dan cookie-nya (sebelumnya setelah logout bisa otomatis masuk lagi lewat halaman login).
 - Hash pembanding waktu di login diperbaiki (sebelumnya tidak valid sehingga username yang ada/tidak ada bisa ditebak dari waktu respons).
 - .htaccess: blokir akses browser ke folder data/, logs/, includes/, _cadangan_*, .git dan file .sql .bak .log .md error_log config*.php.
+
+## Fitur baru (branch uji-coba)
+- **Backup Database** (khusus superadmin, menu Administrasi): unduh semua tabel sebagai .sql (dibuat lewat PHP, tanpa mysqldump) dan unduh foto & berkas sebagai .zip. Dilindungi token CSRF dan tercatat di Riwayat Aktivitas.
+- **Peringatan stok menipis**: panel "Perlu segera dibeli" di dashboard (urut paling kritis, bar sisa stok, label Habis), lencana merah di menu "Realisasi & Limit Stok". Batas stok tetap diatur di Realisasi & Limit Stok.
+- **Permintaan berulang**: tombol "Ajukan lagi" di Progres ATK mengisi form permintaan baru dengan barang & jumlah dari permintaan lama (barang yang sudah dihapus dilewati; hanya permintaan milik akun sendiri).

@@ -114,6 +114,7 @@ require __DIR__ . '/includes/header.php';
       <?php elseif ($r['status'] === 'menunggu'): ?>
         <span class="pq-edit-hint">Waktu edit (1 jam) sudah habis</span>
       <?php endif; ?>
+      <a class="btn btn-ghost" style="font-size:12.5px;padding:7px 12px;" href="permintaan.php?ulang=<?= (int)$r['id'] ?>" title="Isi form permintaan baru dengan barang yang sama">&#8635; Ajukan lagi</a>
       <?php if ($r['bast_file']): ?>
         <button type="button" class="btn btn-ghost js-view-doc" style="font-size:12.5px;padding:7px 12px;margin-left:auto;"
           data-url="serve_permintaan_bast.php?id=<?= (int)$r['id'] ?>"

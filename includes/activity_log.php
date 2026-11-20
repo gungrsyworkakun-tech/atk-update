@@ -53,9 +53,9 @@ function activity_label(array $r): array {
     $m = [
         'barang' => 'Data barang', 'transaksi' => 'Transaksi', 'harga' => 'Harga', 'stok_minimum' => 'Stok minimum',
         'permintaan' => 'Permintaan', 'penitipan' => 'Penitipan', 'akun' => 'Akun', 'bidang' => 'Bidang',
-        'notifikasi' => 'Notifikasi', 'bast' => 'BAST',
+        'notifikasi' => 'Notifikasi', 'bast' => 'BAST', 'backup' => 'Backup',
     ];
-    $aksi = ['tambah' => 'menambah', 'ubah' => 'mengubah', 'hapus' => 'menghapus', 'status' => 'memperbarui', 'masuk' => 'mencatat masuk', 'keluar' => 'mencatat keluar'];
+    $aksi = ['tambah' => 'menambah', 'ubah' => 'mengubah', 'hapus' => 'menghapus', 'status' => 'memperbarui', 'masuk' => 'mencatat masuk', 'keluar' => 'mencatat keluar', 'unduh' => 'mengunduh'];
     $warna = 'blue';
     if ($r['aksi'] === 'hapus') $warna = 'red';
     elseif ($r['tipe'] === 'masuk') $warna = 'green';
