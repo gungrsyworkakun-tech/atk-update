@@ -58,7 +58,7 @@ require __DIR__ . '/includes/header.php';
       <label style="font-size:12px;color:var(--text-dim);cursor:pointer;"><input type="checkbox" class="js-pilih-semua"> Pilih semua</label>
     </div>
     <table>
-      <thead><tr><th style="width:34px;"></th><th>Tanggal ambil</th><th>Barang</th><th>Jumlah</th></tr></thead>
+      <thead><tr><th style="width:34px;"></th><th>Tanggal ambil</th><th>Barang</th><th>Jumlah</th><th>Pengambil</th></tr></thead>
       <tbody>
         <?php foreach ($o['items'] as $it): ?>
         <tr>
@@ -66,6 +66,7 @@ require __DIR__ . '/includes/header.php';
           <td class="mono"><?= e($it['tanggal']) ?></td>
           <td><?= e($it['nama_barang']) ?></td>
           <td class="mono"><?= (int)$it['jumlah'] ?> <?= e($it['satuan']) ?></td>
+          <td><?= e(($it['penanggung_jawab'] ?? '') !== '' ? $it['penanggung_jawab'] : '-') ?></td>
         </tr>
         <?php endforeach; ?>
       </tbody>
@@ -77,25 +78,12 @@ require __DIR__ . '/includes/header.php';
   <div class="card js-seksi">
     <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;">
       <div>
-        <h3 style="margin:0;">Permintaan sebelumnya</h3>
-        <div style="font-size:12px;color:var(--text-dim);margin-top:2px;">Permintaan yang sudah Selesai dan barang yang dicatat diambil langsung · <?= count($riwayatLain) ?> baris</div>
+        <h3 style="margin:0;">Riwayat sebelumnya</h3>
+        <div style="font-size:12px;color:var(--text-dim);margin-top:2px;">Dipisah: yang diminta lewat admin bidang, dan yang diambil langsung oleh masing-masing orang · <?= count($riwayatLain) ?> barang</div>
       </div>
       <label style="font-size:12px;color:var(--text-dim);cursor:pointer;"><input type="checkbox" class="js-pilih-semua"> Pilih semua</label>
     </div>
-    <table>
-      <thead><tr><th style="width:34px;"></th><th>Tanggal</th><th>Barang</th><th>Jumlah</th><th>Asal</th></tr></thead>
-      <tbody>
-        <?php foreach ($riwayatLain as $r): ?>
-        <tr>
-          <td><input type="checkbox" name="k[]" value="<?= e($r['key']) ?>" class="js-baris"></td>
-          <td class="mono"><?= e($r['tanggal']) ?></td>
-          <td><?= e($r['nama']) ?></td>
-          <td class="mono"><?= (int)$r['jumlah'] ?> <?= e($r['satuan']) ?></td>
-          <td style="font-size:12px;color:var(--text-dim);"><?= e($r['sumber']) ?></td>
-        </tr>
-        <?php endforeach; ?>
-      </tbody>
-    </table>
+    <?php render_riwayat_kelompok($riwayatLain); ?>
   </div>
   <?php endif; ?>
 </form>

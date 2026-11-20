@@ -190,10 +190,13 @@ usort($lowList, function ($x, $y) {
 $lowTotal = count($lowList);
 $lowList = array_slice($lowList, 0, 8);
 if ($lowList): ?>
-<div class="card low-card">
+<div class="card low-card" id="lowCard">
   <div class="low-head">
     <h3><?= icon('gauge', 18) ?> Perlu segera dibeli <span class="low-count"><?= (int)$lowTotal ?> barang</span></h3>
-    <?php if (has_permission('realisasi')): ?><a class="btn btn-ghost" href="<?= e(clean_url('realisasi.php')) ?>">Atur batas stok</a><?php endif; ?>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <?php if (has_permission('realisasi')): ?><a class="btn btn-ghost" href="<?= e(clean_url('realisasi.php')) ?>">Atur batas stok</a><?php endif; ?>
+      <button type="button" class="low-toggle" id="lowToggle">Sembunyikan</button>
+    </div>
   </div>
   <div class="low-list">
     <?php foreach ($lowList as $lw):
@@ -216,6 +219,18 @@ if ($lowList): ?>
   <?php if ($lowTotal > count($lowList)): ?><div class="low-more">+ <?= $lowTotal - count($lowList) ?> barang lain perlu diperhatikan</div><?php endif; ?>
   <div class="low-note">Perkiraan dihitung dari rata-rata barang keluar 90 hari terakhir. Barang yang belum pernah keluar tidak punya perkiraan.</div>
 </div>
+<script>
+(function () {
+  var c = document.getElementById('lowCard'), b = document.getElementById('lowToggle');
+  function set(h) { c.classList.toggle('is-collapsed', h); b.textContent = h ? 'Tampilkan' : 'Sembunyikan'; }
+  var h = false; try { h = localStorage.getItem('atk-low-hide') === '1'; } catch (e) {}
+  set(h);
+  b.addEventListener('click', function () {
+    h = !c.classList.contains('is-collapsed'); set(h);
+    try { localStorage.setItem('atk-low-hide', h ? '1' : '0'); } catch (e) {}
+  });
+})();
+</script>
 <?php endif; ?>
 
 <div class="dash-columns">

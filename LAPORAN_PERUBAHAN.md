@@ -181,3 +181,8 @@ Baru: `aktivitas.php`, `includes/activity_log.php`. Diubah: `index.php`, `includ
 ## Perkiraan habis (branch uji-coba)
 - Panel "Perlu segera dibeli" di dashboard kini menampilkan perkiraan kapan barang habis ("Habis ±10 hari lagi (30 Nov)") dan rata-rata pemakaian per minggu, dihitung dari barang keluar 90 hari terakhir (minimal jendela 14 hari).
 - Barang yang diperkirakan habis dalam 30 hari ikut tampil walau belum di bawah batas minimum; yang sisa ≤7 hari berwarna merah. Barang yang belum pernah keluar tidak punya perkiraan.
+
+## Panel stok bisa disembunyikan & riwayat pengambilan dipisah (branch uji-coba)
+- Dashboard: panel "Perlu segera dibeli" punya tombol Sembunyikan/Tampilkan; pilihannya diingat di browser.
+- Bidang Pengambilan (admin) dan Riwayat Pengambilan (akun bidang): riwayat tiap bidang dipisah jadi (1) "Diminta lewat admin bidang" (permintaan selesai + penanggung jawab) dan (2) "Diambil langsung di gudang" dikelompokkan per nama pengambil (kolom penerima). Tiap bagian/orang punya tombol "Pilih bagian ini/orang ini", jadi admin bidang bebas memilih barang mana yang masuk BAST.
+- Kiriman dari admin kini menampilkan kolom Pengambil. BAST tetap bisa dibuat superadmin (dari Bidang Pengambilan) dan admin bidang (dari Riwayat Pengambilan).

@@ -48,6 +48,7 @@ function riwayat_bidang(PDO $pdo, ?string $bidang = null, ?string $dari = null, 
                 'key' => 'p:' . $r['id'], 'tanggal' => $r['tanggal'], 'bidang' => $r['bidang'],
                 'pj' => (string)$r['pj'], 'nama' => $r['nama'], 'jumlah' => (int)$r['jumlah'],
                 'satuan' => $r['satuan'], 'sumber' => 'Permintaan bidang',
+                'jenis' => 'permintaan', 'orang' => trim((string)$r['pj']),
             ];
         }
     }
@@ -64,7 +65,7 @@ function riwayat_bidang(PDO $pdo, ?string $bidang = null, ?string $dari = null, 
             $a = array_merge($a, $idsT);
         }
         $st = $pdo->prepare("
-            SELECT t.id, t.tanggal, t.bidang, t.jumlah,
+            SELECT t.id, t.tanggal, t.bidang, t.jumlah, t.penerima,
                    COALESCE(i.nama, '(barang dihapus)') AS nama, COALESCE(i.satuan, 'pcs') AS satuan
             FROM transactions t
             LEFT JOIN items i ON i.id = t.item_id
@@ -75,6 +76,7 @@ function riwayat_bidang(PDO $pdo, ?string $bidang = null, ?string $dari = null, 
                 'key' => 't:' . $r['id'], 'tanggal' => $r['tanggal'], 'bidang' => $r['bidang'],
                 'pj' => '', 'nama' => $r['nama'], 'jumlah' => (int)$r['jumlah'],
                 'satuan' => $r['satuan'], 'sumber' => 'Dicatat admin',
+                'jenis' => 'langsung', 'orang' => trim((string)($r['penerima'] ?? '')),
             ];
         }
     }
@@ -399,25 +401,7 @@ function render_riwayat_cards(array $byBidang, array $operMap = [], array $akun 
           <input type="checkbox" class="js-pilih-semua"> Pilih semua
         </label>
       </div>
-      <table>
-        <thead><tr><th style="width:34px;"></th><th>Tanggal</th><th>Barang diambil</th><th>Jumlah</th><th>Asal</th></tr></thead>
-        <tbody>
-          <?php foreach ($list as $t): ?>
-          <tr>
-            <td><input type="checkbox" name="k[]" value="<?= e($t['key']) ?>" class="js-baris"></td>
-            <td class="mono"><?= e($t['tanggal']) ?></td>
-            <td><?= e($t['nama']) ?></td>
-            <td class="mono"><?= (int)$t['jumlah'] ?> <?= e($t['satuan']) ?></td>
-            <td style="font-size:12px;color:var(--text-dim);">
-              <?= e($t['sumber']) ?>
-              <?php if (!empty($operMap[$t['key']])): ?>
-                <div style="color:var(--teal-dark);">✓ sudah dioper ke <?= e(implode(', ', array_unique($operMap[$t['key']]))) ?></div>
-              <?php endif; ?>
-            </td>
-          </tr>
-          <?php endforeach; ?>
-        </tbody>
-      </table>
+      <?php render_riwayat_kelompok($list, $operMap); ?>
 
       <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid var(--line,#232a35);">
         <?php if ($akun): ?>
@@ -443,4 +427,78 @@ function render_riwayat_cards(array $byBidang, array $operMap = [], array $akun 
 <?php
     endforeach;
     render_riwayat_js();
+}
+
+/**
+ * Pisahkan riwayat satu bidang jadi dua bagian supaya tidak membingungkan:
+ *  1) Permintaan lewat admin bidang (Permintaan ATK yang sudah Selesai), lengkap dengan penanggung jawabnya.
+ *  2) Diambil langsung di gudang oleh orang di bidang itu, dikelompokkan per nama pengambil.
+ * Semua baris tetap bisa dicentang (name="k[]", class "js-baris") untuk Buat BAST / Oper.
+ */
+function render_riwayat_kelompok(array $list, array $operMap = []): void
+{
+    static $jsSudah = false;
+    $minta = [];
+    $langsung = [];
+    foreach ($list as $r) {
+        if (($r['jenis'] ?? '') === 'permintaan') { $minta[] = $r; continue; }
+        $o = trim((string)($r['orang'] ?? ''));
+        $langsung[$o !== '' ? $o : '(nama pengambil tidak dicatat)'][] = $r;
+    }
+    $tanpaNama = '(nama pengambil tidak dicatat)';
+    $adaTanpa = $langsung[$tanpaNama] ?? null;
+    unset($langsung[$tanpaNama]);
+    ksort($langsung, SORT_NATURAL | SORT_FLAG_CASE);
+    if ($adaTanpa) $langsung[$tanpaNama] = $adaTanpa;
+
+    $tabel = function (array $rows, bool $kolomPj) use ($operMap) {
+        echo '<table><thead><tr><th style="width:34px;"></th><th>Tanggal</th><th>Barang</th><th>Jumlah</th>' . ($kolomPj ? '<th>Penanggung jawab</th>' : '') . '<th></th></tr></thead><tbody>';
+        foreach ($rows as $t) {
+            echo '<tr><td><input type="checkbox" name="k[]" value="' . e($t['key']) . '" class="js-baris"></td>'
+               . '<td class="mono">' . e($t['tanggal']) . '</td><td>' . e($t['nama']) . '</td>'
+               . '<td class="mono">' . (int)$t['jumlah'] . ' ' . e($t['satuan']) . '</td>';
+            if ($kolomPj) echo '<td>' . e($t['pj'] !== '' ? $t['pj'] : '-') . '</td>';
+            echo '<td style="font-size:12px;color:var(--teal-dark);">';
+            if (!empty($operMap[$t['key']])) echo '✓ sudah dioper ke ' . e(implode(', ', array_unique($operMap[$t['key']])));
+            echo '</td></tr>';
+        }
+        echo '</tbody></table>';
+    };
+
+    if ($minta): ?>
+    <div class="rk-grup js-grup rk-minta">
+      <div class="rk-head">
+        <div><b><?= icon('clipboard', 15) ?> Diminta lewat admin bidang</b><small>Permintaan ATK yang sudah selesai · <?= count($minta) ?> barang</small></div>
+        <label class="rk-pilih"><input type="checkbox" class="js-pilih-grup"> Pilih bagian ini</label>
+      </div>
+      <?php $tabel($minta, true); ?>
+    </div>
+    <?php endif;
+    if ($langsung): ?>
+    <div class="rk-sec"><?= icon('user-check', 15) ?> Diambil langsung di gudang oleh orang di bidang ini</div>
+    <?php foreach ($langsung as $orang => $rows): ?>
+    <div class="rk-grup js-grup rk-langsung">
+      <div class="rk-head">
+        <div><b><span class="rk-avatar"><?= $orang[0] === '(' ? '?' : e(mb_strtoupper(mb_substr($orang, 0, 1))) ?></span> <?= e($orang) ?></b><small><?= count($rows) ?> barang</small></div>
+        <label class="rk-pilih"><input type="checkbox" class="js-pilih-grup"> Pilih orang ini</label>
+      </div>
+      <?php $tabel($rows, false); ?>
+    </div>
+    <?php endforeach; endif;
+
+    if (!$jsSudah) { $jsSudah = true; ?>
+<script>
+document.querySelectorAll('.js-grup').forEach(function (g) {
+  var all = g.querySelector('.js-pilih-grup'), rows = g.querySelectorAll('.js-baris');
+  function sync() { all.checked = rows.length > 0 && g.querySelectorAll('.js-baris:checked').length === rows.length; }
+  all.addEventListener('change', function () {
+    rows.forEach(function (c) { c.checked = all.checked; c.dispatchEvent(new Event('change', {bubbles: true})); });
+  });
+  rows.forEach(function (c) { c.addEventListener('change', sync); });
+  var f = g.closest('form');
+  if (f) f.addEventListener('change', function (e) { if (e.target.classList.contains('js-pilih-semua')) setTimeout(sync, 0); });
+  sync();
+});
+</script>
+<?php }
 }

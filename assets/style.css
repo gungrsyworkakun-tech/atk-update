@@ -1112,3 +1112,18 @@ html.theme-anim,html.theme-anim *{transition:background-color .2s,border-color .
 .low-row{grid-template-columns:minmax(0,2fr) minmax(80px,1fr) 190px}
 .low-est{margin-top:2px;color:var(--text-dim);font-weight:600}.low-est.urgent{color:var(--red)}
 .low-note{font-size:11.5px;color:var(--text-faint);padding-top:8px;margin-top:6px;border-top:1px solid var(--line-soft)}
+
+/* ===== Riwayat per bidang: dipisah permintaan vs ambil langsung ===== */
+.rk-grup{border:1px solid var(--line);border-radius:12px;margin:10px 0;overflow:hidden;background:var(--surface)}
+.rk-minta{border-left:4px solid var(--accent)}.rk-langsung{border-left:4px solid #12A67F}
+.rk-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px;background:var(--surface-2);border-bottom:1px solid var(--line-soft)}
+.rk-head b{display:flex;align-items:center;gap:7px;font-size:13.5px}.rk-head small{display:block;font-size:11.5px;color:var(--text-dim);margin-top:2px}
+.rk-pilih{font-size:12px;color:var(--text-dim);cursor:pointer}
+.rk-sec{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--text-dim);margin:16px 0 4px}
+.rk-avatar{width:22px;height:22px;border-radius:50%;background:var(--tag-green-bg);color:var(--tag-green-fg);display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:800}
+.rk-grup table{margin:0}.rk-grup td,.rk-grup th{padding-left:14px}
+/* ===== Panel stok menipis bisa disembunyikan ===== */
+.low-toggle{background:none;border:1px solid var(--line);border-radius:10px;padding:6px 12px;font-size:12px;font-weight:600;color:var(--text-dim);cursor:pointer}
+.low-toggle:hover{border-color:var(--accent);color:var(--accent)}
+.low-card.is-collapsed .low-list,.low-card.is-collapsed .low-more,.low-card.is-collapsed .low-note{display:none}
+.low-card.is-collapsed{padding-top:10px;padding-bottom:10px}.low-card.is-collapsed .low-head{margin-bottom:0}
