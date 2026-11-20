@@ -177,3 +177,7 @@ Baru: `aktivitas.php`, `includes/activity_log.php`. Diubah: `index.php`, `includ
 - **Backup Database** (khusus superadmin, menu Administrasi): unduh semua tabel sebagai .sql (dibuat lewat PHP, tanpa mysqldump) dan unduh foto & berkas sebagai .zip. Dilindungi token CSRF dan tercatat di Riwayat Aktivitas.
 - **Peringatan stok menipis**: panel "Perlu segera dibeli" di dashboard (urut paling kritis, bar sisa stok, label Habis), lencana merah di menu "Realisasi & Limit Stok". Batas stok tetap diatur di Realisasi & Limit Stok.
 - **Permintaan berulang**: tombol "Ajukan lagi" di Progres ATK mengisi form permintaan baru dengan barang & jumlah dari permintaan lama (barang yang sudah dihapus dilewati; hanya permintaan milik akun sendiri).
+
+## Perkiraan habis (branch uji-coba)
+- Panel "Perlu segera dibeli" di dashboard kini menampilkan perkiraan kapan barang habis ("Habis ±10 hari lagi (30 Nov)") dan rata-rata pemakaian per minggu, dihitung dari barang keluar 90 hari terakhir (minimal jendela 14 hari).
+- Barang yang diperkirakan habis dalam 30 hari ikut tampil walau belum di bawah batas minimum; yang sisa ≤7 hari berwarna merah. Barang yang belum pernah keluar tidak punya perkiraan.

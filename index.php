@@ -159,25 +159,62 @@ require __DIR__ . '/includes/header.php';
 </div>
 
 <?php
-$lowList = $pdo->query('SELECT id, kode, nama, satuan, stok, stok_minimum FROM items WHERE stok_minimum > 0 AND stok <= stok_minimum ORDER BY (stok / stok_minimum) ASC, nama LIMIT 8')->fetchAll();
+// ---- Perkiraan habis: rata-rata pemakaian harian dari barang KELUAR 90 hari terakhir ----
+$jendela = 90;
+$cutoff = date('Y-m-d', strtotime("-$jendela days"));
+$pakaiStmt = $pdo->prepare("SELECT item_id, SUM(jumlah) total, MIN(tanggal) pertama FROM transactions WHERE tipe = 'keluar' AND tanggal >= ? GROUP BY item_id");
+$pakaiStmt->execute([$cutoff]);
+$perHari = [];
+foreach ($pakaiStmt->fetchAll() as $pk) {
+    $hari = max(14, min($jendela, (int)ceil((time() - strtotime($pk['pertama'])) / 86400) + 1)); // min 14 hari agar tidak terlalu tinggi
+    $perHari[(int)$pk['item_id']] = (float)$pk['total'] / $hari;
+}
+$semua = $pdo->query('SELECT id, kode, nama, satuan, stok, stok_minimum FROM items')->fetchAll();
+$lowList = [];
+foreach ($semua as $it) {
+    $rate = $perHari[(int)$it['id']] ?? 0;
+    $it['sisa_hari'] = ($rate > 0 && $it['stok'] > 0) ? (int)floor($it['stok'] / $rate) : null;
+    $it['rate'] = $rate;
+    $rendahIni = $it['stok_minimum'] > 0 && $it['stok'] <= $it['stok_minimum'];
+    $segeraHabis = $it['sisa_hari'] !== null && $it['sisa_hari'] <= 30;
+    if ($rendahIni || $segeraHabis || ($it['stok'] <= 0 && $rate > 0)) {
+        $it['rendah'] = $rendahIni;
+        $lowList[] = $it;
+    }
+}
+usort($lowList, function ($x, $y) {
+    $kx = $x['stok'] <= 0 ? -1 : ($x['sisa_hari'] ?? 9999);
+    $ky = $y['stok'] <= 0 ? -1 : ($y['sisa_hari'] ?? 9999);
+    return $kx <=> $ky ?: strcmp($x['nama'], $y['nama']);
+});
+$lowTotal = count($lowList);
+$lowList = array_slice($lowList, 0, 8);
 if ($lowList): ?>
 <div class="card low-card">
   <div class="low-head">
-    <h3><?= icon('gauge', 18) ?> Perlu segera dibeli <span class="low-count"><?= (int)$rendah ?> barang</span></h3>
+    <h3><?= icon('gauge', 18) ?> Perlu segera dibeli <span class="low-count"><?= (int)$lowTotal ?> barang</span></h3>
     <?php if (has_permission('realisasi')): ?><a class="btn btn-ghost" href="<?= e(clean_url('realisasi.php')) ?>">Atur batas stok</a><?php endif; ?>
   </div>
   <div class="low-list">
     <?php foreach ($lowList as $lw):
-      $pct = max(0, min(100, (int)round($lw['stok'] / max(1, $lw['stok_minimum']) * 100)));
-      $habis = (int)$lw['stok'] <= 0; ?>
+      $habis = (int)$lw['stok'] <= 0;
+      $pct = $lw['stok_minimum'] > 0 ? max(0, min(100, (int)round($lw['stok'] / max(1, $lw['stok_minimum']) * 100)))
+           : ($lw['sisa_hari'] !== null ? max(0, min(100, (int)round($lw['sisa_hari'] / 30 * 100))) : 0);
+      $est = null;
+      if (!$habis && $lw['sisa_hari'] !== null) $est = $lw['sisa_hari'] <= 0 ? 'Habis hari ini' : 'Habis ±' . $lw['sisa_hari'] . ' hari lagi (' . date('d M', strtotime('+' . $lw['sisa_hari'] . ' days')) . ')';
+      $urgent = $habis || ($lw['sisa_hari'] !== null && $lw['sisa_hari'] <= 7); ?>
       <div class="low-row">
-        <div class="low-name"><b><?= e($lw['nama']) ?></b><small><?= e($lw['kode']) ?></small></div>
+        <div class="low-name"><b><?= e($lw['nama']) ?></b><small><?= e($lw['kode']) ?><?= $lw['rate'] > 0 ? ' · pakai ±' . rtrim(rtrim(number_format($lw['rate'] * 7, 1, ',', ''), '0'), ',') . ' ' . e($lw['satuan']) . '/minggu' : '' ?></small></div>
         <div class="low-bar"><span class="<?= $habis ? 'is-out' : '' ?>" style="width:<?= $pct ?>%"></span></div>
-        <div class="low-num <?= $habis ? 'is-out' : '' ?>"><?= $habis ? 'Habis' : (int)$lw['stok'] . ' ' . e($lw['satuan']) ?><small>batas <?= (int)$lw['stok_minimum'] ?></small></div>
+        <div class="low-num <?= $habis ? 'is-out' : '' ?>"><?= $habis ? 'Habis' : (int)$lw['stok'] . ' ' . e($lw['satuan']) ?>
+          <?php if ($lw['stok_minimum'] > 0): ?><small>batas <?= (int)$lw['stok_minimum'] ?></small><?php endif; ?>
+          <?php if ($est): ?><small class="low-est <?= $urgent ? 'urgent' : '' ?>"><?= e($est) ?></small><?php endif; ?>
+        </div>
       </div>
     <?php endforeach; ?>
   </div>
-  <?php if ($rendah > count($lowList)): ?><div class="low-more">+ <?= (int)$rendah - count($lowList) ?> barang lain di bawah batas</div><?php endif; ?>
+  <?php if ($lowTotal > count($lowList)): ?><div class="low-more">+ <?= $lowTotal - count($lowList) ?> barang lain perlu diperhatikan</div><?php endif; ?>
+  <div class="low-note">Perkiraan dihitung dari rata-rata barang keluar 90 hari terakhir. Barang yang belum pernah keluar tidak punya perkiraan.</div>
 </div>
 <?php endif; ?>
 
