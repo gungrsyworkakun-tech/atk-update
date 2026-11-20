@@ -1127,3 +1127,23 @@ html.theme-anim,html.theme-anim *{transition:background-color .2s,border-color .
 .low-toggle:hover{border-color:var(--accent);color:var(--accent)}
 .low-card.is-collapsed .low-list,.low-card.is-collapsed .low-more,.low-card.is-collapsed .low-note{display:none}
 .low-card.is-collapsed{padding-top:10px;padding-bottom:10px}.low-card.is-collapsed .low-head{margin-bottom:0}
+
+/* ===== Tampilan HP (semua halaman admin) ===== */
+@media (max-width:640px){
+  .db-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
+  .db-card-add{min-height:150px!important;grid-column:1/-1}
+  .db-card .db-photo{height:120px!important;min-height:0!important;aspect-ratio:auto!important}.db-card .db-photo-placeholder{height:100%!important;display:flex;align-items:center;justify-content:center}
+  .page-title{white-space:normal!important;font-size:16px!important;line-height:1.2}
+  .btn,button.btn,.icon-btn-ghost{min-height:42px}
+  input,select,textarea{font-size:16px!important}               /* cegah zoom otomatis di iPhone */
+  table{font-size:13px}
+  .modal,.pn-modal,[class*="modal-box"]{max-width:100vw!important;width:calc(100vw - 16px)!important;max-height:92vh;overflow-y:auto}
+  .topline{flex-wrap:wrap;gap:10px}
+}
+@media (max-width:640px){ main,.content,.page{padding-left:14px;padding-right:14px} }
+@media (max-width:640px){
+  .grid-stats{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
+  .grid-stats .stat-card{flex-direction:column;align-items:flex-start;gap:10px;padding:14px!important}
+  .grid-stats .stat-ic{width:40px!important;height:40px!important}
+  .grid-stats .val{font-size:22px!important}
+}

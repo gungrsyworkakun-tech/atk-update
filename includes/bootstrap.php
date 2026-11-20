@@ -16,6 +16,11 @@ if (!headers_sent()) {
     header('X-Content-Type-Options: nosniff');
     header('Referrer-Policy: strict-origin-when-cross-origin');
     header('Permissions-Policy: geolocation=(), microphone=(), camera=(self)');
+    // Pengaman isi halaman: hanya boleh memuat script/gambar/font dari situs sendiri (+ Google Fonts untuk huruf).
+    header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; "
+        . "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; "
+        . "img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self'; frame-src 'self'; object-src 'self'; "
+        . "base-uri 'self'; form-action 'self'; frame-ancestors 'self'");
     if ($__https) header('Strict-Transport-Security: max-age=31536000');
 }
 session_start();

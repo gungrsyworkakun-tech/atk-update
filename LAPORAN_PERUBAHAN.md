@@ -186,3 +186,8 @@ Baru: `aktivitas.php`, `includes/activity_log.php`. Diubah: `index.php`, `includ
 - Dashboard: panel "Perlu segera dibeli" punya tombol Sembunyikan/Tampilkan; pilihannya diingat di browser.
 - Bidang Pengambilan (admin) dan Riwayat Pengambilan (akun bidang): riwayat tiap bidang dipisah jadi (1) "Diminta lewat admin bidang" (permintaan selesai + penanggung jawab) dan (2) "Diambil langsung di gudang" dikelompokkan per nama pengambil (kolom penerima). Tiap bagian/orang punya tombol "Pilih bagian ini/orang ini", jadi admin bidang bebas memilih barang mana yang masuk BAST.
 - Kiriman dari admin kini menampilkan kolom Pengambil. BAST tetap bisa dibuat superadmin (dari Bidang Pengambilan) dan admin bidang (dari Riwayat Pengambilan).
+
+## Tampilan HP + Pengaman isi halaman (CSP)
+- **CSP** ditambah di `includes/bootstrap.php`: script/gambar/font hanya boleh dari situs sendiri (+ Google Fonts untuk huruf). Situs luar lain diblokir browser.
+- Chart.js dan html5-qrcode sekarang dimuat dari folder `assets/` (tidak lagi dari CDN luar): `assets/chart.umd.js`, `assets/html5-qrcode.min.js`.
+- **HP**: semua halaman admin dicek di lebar 390px, tidak ada yang meluber ke samping. Ditambah aturan di akhir `assets/style.css`: kartu barang & statistik 2 kolom, judul bar atas tidak terpotong, tombol lebih besar, input 16px (tidak zoom di iPhone), modal muat di layar.
